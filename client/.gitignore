@@ -1,0 +1,8 @@
+# tsc-generated files
+page/js/*
+
+!page/js/lib/
+page/js/lib/*
+
+# libs in client/page/js
+!page/js/lib/pixi.min.js
