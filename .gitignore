@@ -1,2 +1,5 @@
 # tsc-generated files
 dist/
+
+# node libs
+node_modules/
