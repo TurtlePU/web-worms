@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "outDir": "page/js"
+        "outDir": "page/dist"
     },
     "files": [
         "ts/main.ts"
