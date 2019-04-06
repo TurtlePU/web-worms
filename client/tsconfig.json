@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "outDir": "page/js"
+    },
+    "files": [
+        "ts/main.ts"
+    ]
+}
