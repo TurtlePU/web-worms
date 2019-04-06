@@ -4,6 +4,7 @@
   "description": "Worms II in your browser. Not affiliated with Team 17.",
   "main": "dist/server.js",
   "scripts": {
+    "prestart": "tsc && tsc -p client",
     "start": "node dist/server.js"
   },
   "repository": {
