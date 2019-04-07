@@ -1,4 +1,4 @@
-///<reference path="pixi.js.d.ts"/>
+///<reference path='pixi.js.d.ts'/>
 
 export default class Loader extends PIXI.loaders.Loader {
     async loadAsync() {
