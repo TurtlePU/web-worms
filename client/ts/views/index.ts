@@ -1,5 +1,4 @@
-import { Router } from '../lib/router.js';
-import { $, setView } from '../lib/html.util.js';
+import { $, setView, Router } from '../lib/turtle.js';
 
 export function IndexHandler() {
     let indexHtml = (<HTMLScriptElement> $('index')).innerHTML;
