@@ -1,5 +1,4 @@
-import { Cookies } from './lib/turtle.js';
-import { Router } from './lib/router.js';
+import { Router } from './lib/turtle/router.js';
 
 import { RootView } from './views/root.js';
 import { IndexView } from './views/index.js';
