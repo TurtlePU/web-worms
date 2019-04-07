@@ -10,18 +10,6 @@ export type RouterEntry = {
     handler: Function
 };
 
-export type RouterInput = {
-    matcher?: string | RegExp,
-    handler: Function
-};
-
-function getRoute(options: RouterInput) {
-    return {
-        matcher: options.matcher || '',
-        handler: options.handler
-    };
-};
-
 function clearSlashes(path: string) {
     return path.replace(/\/$/, '').replace(/^\//, '');
 };
@@ -30,6 +18,7 @@ export const Router = {
     _routes: [] as RouterEntry[],
     _mode: 'hash' as RouterMode,
     _root: '/',
+    listens: false,
 
     config: function(options?: RouterOptions) {
         Router._mode =
@@ -65,8 +54,8 @@ export const Router = {
         return clearSlashes(fragment);
     },
 
-    add: function(options: RouterInput) {
-        Router._routes.push(getRoute(options));
+    add: function(options: RouterEntry) {
+        Router._routes.push(options);
         return Router;
     },
 
@@ -87,20 +76,26 @@ export const Router = {
         return Router;
     },
 
-    check: function(fragment: string) {
-        fragment = fragment || Router._getFragment();
+    _check: function() {
+        let fragment = Router._getFragment();
         Router._routes.some(element => {
             let match = fragment.match(element.matcher);
             if (match !== null) {
                 match.shift();
-                element.handler.apply({}, match);
+                element.handler(match);
                 return true;
             }
         });
         return Router;
     },
 
-    // good listener needed
+    listen: function() {
+        if (!Router.listens) {
+            window.addEventListener('hashchange', Router._check);
+            Router.listens = true;
+        }
+        return Router;
+    },
 
     navigate: function(path: string | null) {
         path = path ? path : '';
