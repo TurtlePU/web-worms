@@ -10,6 +10,8 @@ export type RouterEntry = {
     handler: Function
 };
 
+import { View } from './turtle.js';
+
 function clearSlashes(path: string) {
     return path.replace(/\/$/, '').replace(/^\//, '');
 };
@@ -53,8 +55,13 @@ export const Router = {
         return clearSlashes(fragment);
     },
 
-    add: function(options: RouterEntry) {
-        Router._routes.push(options);
+    add: function(arg: RouterEntry | View<any>) {
+        Router._routes.push(
+            arg instanceof View
+                ? { matcher: arg.id,
+                    handler: arg.load }
+                : arg
+        );
         return Router;
     },
 

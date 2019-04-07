@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "outDir": "page/dist"
+        "allowJs": true,
+        "outDir": "page/dist",
+        "target": "es6"
     },
     "files": [
-        "src/main.ts"
+        "page/src/main.ts"
     ]
 }
