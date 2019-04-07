@@ -10,7 +10,7 @@ export type RouterEntry = {
     handler: Function
 };
 
-import { View } from './turtle.js';
+import { View } from './main.js';
 
 function clearSlashes(path: string) {
     return path.replace(/\/$/, '').replace(/^\//, '');

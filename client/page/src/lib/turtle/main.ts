@@ -1,9 +1,10 @@
-import * as cookies from './js.cookie.js';
-export const Cookies = cookies;
+///<reference path='js.cookie.d.ts'/>
 
-import * as htmlUtil from './html.util.js';
-export const HtmlUtil = htmlUtil;
-export const $ = HtmlUtil.$;
+export const $ = document.getElementById.bind(document);
+
+function setView(innerHTML: string) {
+    document.body.innerHTML = innerHTML;
+};
 
 export class View<PropsType> {
     id: string;
@@ -17,7 +18,7 @@ export class View<PropsType> {
     }
 
     load(props?: PropsType) {
-        HtmlUtil.setView(this.html);
+        setView(this.html);
         Cookies.set('view', this.id);
         this.props = props;
     }
