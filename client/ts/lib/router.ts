@@ -18,7 +18,6 @@ export const Router = {
     _routes: [] as RouterEntry[],
     _mode: 'hash' as RouterMode,
     _root: '/',
-    listens: false,
 
     config: function(options?: RouterOptions) {
         Router._mode =
@@ -78,9 +77,11 @@ export const Router = {
 
     _check: function() {
         let fragment = Router._getFragment();
+        console.log(`fragment: '${fragment}'`);
         Router._routes.some(element => {
             let match = fragment.match(element.matcher);
-            if (match !== null) {
+            console.log(match);
+            if (match !== null && (match[0] !== '' || fragment === '')) {
                 match.shift();
                 element.handler(match);
                 return true;
@@ -89,21 +90,14 @@ export const Router = {
         return Router;
     },
 
-    listen: function() {
-        if (!Router.listens) {
-            window.addEventListener('hashchange', Router._check);
-            Router.listens = true;
-        }
-        return Router;
-    },
-
-    navigate: function(path: string | null) {
+    navigate: function(path?: string) {
         path = path ? path : '';
+        console.log(`path: '${path}'`);
         if (Router._mode === 'history') {
             history.pushState(null, null, Router._root + clearSlashes(path));
         } else {
             window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + path;
         }
-        return this;
+        return Router._check();
     }
 };
