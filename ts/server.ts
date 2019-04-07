@@ -9,6 +9,8 @@ app.get('/', (_, response) => {
     response.sendFile(path.join(__dirname, '../client/page/index.html'));
 });
 
+app.use(express.static('client/page'));
+
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
