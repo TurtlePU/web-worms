@@ -1,7 +1,10 @@
-import { $, View } from '../lib/turtle.js';
-import { Router } from '../lib/router.js';
+import { $, View } from '../lib/turtle/main.js';
+import { Router } from '../lib/turtle/router.js';
 
-import { root } from '../../js-lib/view.import.js';
+const root = /* html */ `
+    <p>Root</p>
+    <button id='route'>To index</button>
+`;
 
 export class RootView extends View<null> {
     constructor() { super('', root); }
