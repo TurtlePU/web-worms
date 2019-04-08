@@ -22,6 +22,8 @@ export const Router = {
     _root: '/',
 
     config: function(options?: RouterOptions) {
+        console.log('Router.config with')
+        console.log(options);
         Router._mode =
                 options &&
                 options.mode &&
@@ -36,6 +38,7 @@ export const Router = {
             ? '/' + clearSlashes(options.root) + '/'
             : '/';
 
+        console.log(`configged with: { ${Router._mode}, '${Router._root}' }`);
         return Router;
     },
 
@@ -56,6 +59,8 @@ export const Router = {
     },
 
     add: function(arg: RouterEntry | View<any>) {
+        console.log('adding path to:');
+        console.log(arg);
         Router._routes.push(
             arg instanceof View
                 ? { matcher: arg.id,
@@ -66,6 +71,8 @@ export const Router = {
     },
 
     remove: function(param: string | RegExp | Function) {
+        console.log('removing path on:');
+        console.log(param);
         Router._routes.some((element, index, array) => {
             if ((element.matcher && element.matcher === param) || element.handler === param) {
                 array.splice(index, 1);
@@ -84,11 +91,10 @@ export const Router = {
 
     _check: function() {
         let fragment = Router._getFragment();
-        console.log(`fragment: '${fragment}'`);
         Router._routes.some(element => {
             let match = fragment.match(element.matcher);
-            console.log(match);
             if (match !== null && (match[0] !== '' || fragment === '')) {
+                console.log(`found matching route: ${fragment} ~ ${match[0]}`);
                 match.shift();
                 element.handler(match);
                 return true;
@@ -99,7 +105,7 @@ export const Router = {
 
     navigate: function(path?: string) {
         path = path ? path : '';
-        console.log(`path: '${path}'`);
+        console.log(`navigating to: '${path}'`);
         if (Router._mode === 'history') {
             history.pushState(null, null, Router._root + clearSlashes(path));
         } else {
