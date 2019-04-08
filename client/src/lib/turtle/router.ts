@@ -1,80 +1,117 @@
+/** Available modes of Router. */
 export type RouterMode = 'hash' | 'history';
 
+/** Input type for {@link router.ts#Router.config}. */
 export type RouterOptions = {
     mode?: RouterMode,
     root?: string
 };
 
-export type RouterEntry = {
-    matcher: string | RegExp,
+type RouterEntry = {
+    matcher: RegExp,
     handler: Function
 };
 
-import { View } from './main.js';
-
 function clearSlashes(path: string) {
     return path.replace(/\/$/, '').replace(/^\//, '');
+}
+
+function toRegExp(pattern: string | RegExp) {
+    return new RegExp(
+        typeof pattern === 'string'
+            ? `^${pattern}$`
+            : pattern
+    );
+}
+
+/** Interface of a Router. */
+export interface Router {
+    /**
+     * Updates mode and root of Router.
+     * 
+     * @param options - options to be applied
+     * @returns Router
+     */
+    config(options: RouterOptions): Router,
+
+    /**
+     * Adds new route to be controlled by Router.
+     * 
+     * @param matcher - route or RegEx for a series of routes
+     * @param handler - function called when route is navigated. Must accept captures of matcher (if it was a RegEx)
+     * @returns Router
+     */
+    add(matcher: string | RegExp, handler: Function): Router,
+
+    /**
+     * Removes a given route.
+     * 
+     * @param route
+     * @returns Router
+     */
+    remove(route: string | RegExp): Router,
+
+    /**
+     * Removes all routes.
+     * 
+     * @returns Router
+     */
+    flush(): Router,
+
+    /**
+     * Navigates to a route, if it is handled by Router. Otherwise does nothing.
+     * 
+     * @param route
+     * @returns Router
+     */
+    navigate(route: string): Router
+}
+
+var _routes: RouterEntry[] = [];
+var _mode: RouterMode = 'hash';
+var _root = '/';
+
+const _check = (path: string) => {
+    return _routes.some(element => {
+        let match = path.match(element.matcher);
+        if (match !== null) {
+            console.log(`Route._check => '${path}' ~ '${match[0]}'`);
+            match.shift();
+            element.handler(match);
+            return true;
+        }
+    });
 };
 
+/**
+ * Singleton Router object for Single-Page Apps.
+ */
 export const Router = {
-    _routes: [] as RouterEntry[],
-    _mode: 'hash' as RouterMode,
-    _root: '/',
-
     config: (options?: RouterOptions) => {
-        console.log('Router.config with')
-        console.log(options);
-        Router._mode =
-                options &&
-                options.mode &&
-                options.mode === 'history' &&
-                !!(history.pushState)
-            ? 'history'
-            : 'hash';
-
-        Router._root =
-                options &&
-                options.root
-            ? '/' + clearSlashes(options.root) + '/'
-            : '/';
-
-        console.log(`configged with: { ${Router._mode}, '${Router._root}' }`);
-        return Router;
-    },
-
-    _getFragment: () => {
-        let fragment = '';
-        if (Router._mode === 'history') {
-            fragment = clearSlashes(
-                    decodeURI(location.pathname + location.search)
-                ).replace(/\?(.*)$/, '');
-            fragment = Router._root != '/'
-                ? fragment.replace(Router._root, '')
-                : fragment;
-        } else {
-            let match = window.location.href.match(/#(.*)$/);
-            fragment = match ? match[1] : '';
+        console.log('Router.config <=', options);
+        if (options) {
+            _mode = options.mode && !!(history.pushState) ? 'history' : 'hash';
+            _root = options.root ? '/' + clearSlashes(options.root) + '/' : '/';
         }
-        return clearSlashes(fragment);
-    },
-
-    add: (arg: RouterEntry | View<any>) => {
-        console.log('adding path to:');
-        console.log(arg);
-        Router._routes.push(
-            arg instanceof View
-                ? { matcher: arg.id,
-                    handler: arg.load }
-                : arg
-        );
+        console.log(`Router.config => { mode: ${_mode}, root: '${_root}' }`);
         return Router;
     },
 
-    remove: (param: string | RegExp | Function) => {
-        console.log('removing path on:');
-        console.log(param);
-        Router._routes.some((element, index, array) => {
-            if ((element.matcher && element.matcher === param) || element.handler === param) {
+    add: (matcher: string | RegExp, handler: Function) => {
+        console.log(`Router.add <= '${matcher}'`);
+        matcher = toRegExp(matcher);
+        _routes.push({
+            handler,
+            matcher
+        });
+        return Router;
+    },
+
+    remove: (route: string | RegExp) => {
+        console.log('Router.remove <=', route);
+        route = toRegExp(route);
+        _routes.some((element, index, array) => {
+            if (element.matcher === route) {
                 array.splice(index, 1);
                 return true;
             }
@@ -83,34 +120,25 @@ export const Router = {
     },
 
     flush: () => {
-        Router._routes = [];
-        Router._mode = 'hash';
-        Router._root = '/';
+        console.log('Router.flush');
+        _routes = [];
+        _mode = 'hash';
+        _root = '/';
         return Router;
     },
 
-    _check: () => {
-        let fragment = Router._getFragment();
-        Router._routes.some(element => {
-            let match = fragment.match(element.matcher);
-            if (match !== null && (match[0] !== '' || fragment === '')) {
-                console.log(`found matching route: ${fragment} ~ ${match[0]}`);
-                match.shift();
-                element.handler(match);
-                return true;
+    navigate: (route?: string) => {
+        route = route ? route : '';
+        console.log(`Router.navigate <= '${route}'`);
+        if (_check(route)) {
+            if (_mode === 'history') {
+                history.pushState(null, null, _root + clearSlashes(route));
+            } else {
+                window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + route;
             }
-        });
-        return Router;
-    },
-
-    navigate: (path?: string) => {
-        path = path ? path : '';
-        console.log(`navigating to: '${path}'`);
-        if (Router._mode === 'history') {
-            history.pushState(null, null, Router._root + clearSlashes(path));
         } else {
-            window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + path;
+            console.log('Router.navigate => null');
         }
-        return Router._check();
+        return Router;
     }
-};
+} as Router;
