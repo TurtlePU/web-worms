@@ -21,7 +21,7 @@ export const Router = {
     _mode: 'hash' as RouterMode,
     _root: '/',
 
-    config: function(options?: RouterOptions) {
+    config: (options?: RouterOptions) => {
         console.log('Router.config with')
         console.log(options);
         Router._mode =
@@ -42,7 +42,7 @@ export const Router = {
         return Router;
     },
 
-    _getFragment: function() {
+    _getFragment: () => {
         let fragment = '';
         if (Router._mode === 'history') {
             fragment = clearSlashes(
@@ -58,7 +58,7 @@ export const Router = {
         return clearSlashes(fragment);
     },
 
-    add: function(arg: RouterEntry | View<any>) {
+    add: (arg: RouterEntry | View<any>) => {
         console.log('adding path to:');
         console.log(arg);
         Router._routes.push(
@@ -70,7 +70,7 @@ export const Router = {
         return Router;
     },
 
-    remove: function(param: string | RegExp | Function) {
+    remove: (param: string | RegExp | Function) => {
         console.log('removing path on:');
         console.log(param);
         Router._routes.some((element, index, array) => {
@@ -82,14 +82,14 @@ export const Router = {
         return Router;
     },
 
-    flush: function() {
+    flush: () => {
         Router._routes = [];
         Router._mode = 'hash';
         Router._root = '/';
         return Router;
     },
 
-    _check: function() {
+    _check: () => {
         let fragment = Router._getFragment();
         Router._routes.some(element => {
             let match = fragment.match(element.matcher);
@@ -103,7 +103,7 @@ export const Router = {
         return Router;
     },
 
-    navigate: function(path?: string) {
+    navigate: (path?: string) => {
         path = path ? path : '';
         console.log(`navigating to: '${path}'`);
         if (Router._mode === 'history') {
