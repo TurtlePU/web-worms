@@ -77,7 +77,7 @@ const _check = (path: string) => {
         if (match !== null) {
             console.log(`Route._check => '${path}' ~ '${match[0]}'`);
             match.shift();
-            element.handler(match);
+            element.handler(...match);
             return true;
         }
     });
