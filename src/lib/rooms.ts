@@ -1,3 +1,6 @@
+/**
+ * Singleton room handler (all game interaction).
+ */
 export const RoomHandler = {
     /**
      * @returns ID of a free room 

@@ -3,6 +3,11 @@ import path from 'path';
 
 import { RoomHandler } from '../rooms';
 
+/**
+ * Wrapper on Express server for interaction needs.
+ * 
+ * @returns Express server with binded out-of-the-game requests
+ */
 export default function App() {
     const app = express();
 
