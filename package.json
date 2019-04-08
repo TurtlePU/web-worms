@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "compile-server": "rm -rf dist && tsc",
-    "compile-client": "rm -rf client/page/dist && tsc -p client",
+    "compile-client": "rm -rf client/dist && tsc -p client",
     "prestart": "npm run compile-server && npm run compile-client",
     "start": "node dist/server.js"
   },
