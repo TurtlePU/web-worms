@@ -34,9 +34,10 @@ export class View<PropsType> {
      * 
      * @param props 
      */
-    load(props?: PropsType) {
+    load(path: string, props?: PropsType) {
+        console.log(`HTML view <= '${this.ID}'`);
         setView(this.HTML);
-        Cookies.set('view', this.ID);
+        Cookies.set('view', path);
         this.props = props;
     }
 };

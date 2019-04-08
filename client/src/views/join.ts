@@ -12,7 +12,7 @@ function skipSpaces(str: string) {
 }
 
 export class JoinView extends View<null> {
-    input: HTMLInputElement;
+    private input: HTMLInputElement;
 
     constructor() {
         super('', html);
@@ -37,8 +37,8 @@ export class JoinView extends View<null> {
         }
     }
 
-    load() {
-        super.load();
+    load(path: string) {
+        super.load(path);
 
         this.input = <HTMLInputElement> $('room-id');
         this.input.addEventListener('keypress', async event => {

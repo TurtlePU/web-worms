@@ -38,7 +38,7 @@ export interface Router {
      * Adds new route to be controlled by Router.
      * 
      * @param matcher - route or RegEx for a series of routes
-     * @param handler - function called when route is navigated. Must accept captures of matcher (if it was a RegEx)
+     * @param handler - function called when route is navigated. Must accept (path, ...captures of matcher)
      * @returns Router
      */
     add(matcher: string | RegExp, handler: Function): Router,
@@ -77,7 +77,7 @@ const _check = (path: string) => {
         if (match !== null) {
             console.log(`Route._check => '${path}' ~ '${match[0]}'`);
             match.shift();
-            element.handler(...match);
+            element.handler(path, ...match);
             return true;
         }
     });

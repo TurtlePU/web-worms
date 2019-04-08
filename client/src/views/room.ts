@@ -9,13 +9,19 @@ const html = /* html */`
 `;
 
 export class RoomView extends View<string> {
+    private socket: SocketIOClient.Socket;
+
     constructor() { super('room', html); }
 
-    load(roomID: string) {
-        super.load(roomID);
-        Cookies.set('view', `${this.ID}/${this.props}`);
+    load(path: string, roomID: string) {
+        super.load(path, roomID);
+
+        this.socket = io();
 
         let back = <HTMLButtonElement> $('back');
-        back.addEventListener('click', () => Router.navigate(''));
+        back.addEventListener('click', () => {
+            Router.navigate('');
+            this.socket.close();
+        });
     }
 }
