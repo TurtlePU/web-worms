@@ -7,6 +7,10 @@ const html = /* html */`
     <button id='go'>Go</button> <button id='random'>I'm lucky</button>
 `;
 
+function skipSpaces(str: string) {
+    return str.replace(/\s/g, '');
+}
+
 export class JoinView extends View<null> {
     input: HTMLInputElement;
 
@@ -18,13 +22,17 @@ export class JoinView extends View<null> {
     async joinRoom(rnd?: boolean) {
         let url = document.URL.split('#')[0];
         if (rnd) {
-            let room = await fetch(url + 'getRoom');
-            Router.navigate(`rooms/${room}`);
+            let resp = await fetch(url + 'method=getRoom');
+            let id = (await resp.json()).id;
+            Router.navigate(`room/${id}`);
         } else {
-            let room = this.input.value;
-            let exists = await fetch(url + `checkRoom?id=${room}`);
-            if (exists) {
-                Router.navigate(`rooms/${room}`);
+            let room = skipSpaces(this.input.value);
+            if (room !== '') {
+                let resp = await fetch(url + `method=checkRoom/${room}`);
+                let exists = (await resp.json()).exists;
+                if (exists) {
+                    Router.navigate(`room/${room}`);
+                }
             }
         }
     }
