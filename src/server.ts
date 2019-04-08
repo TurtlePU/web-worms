@@ -1,25 +1,13 @@
-import express from 'express';
-import path from 'path';
+import http from 'http';
 
-import { RoomHandler } from './lib/rooms';
+import express from './lib/servers/express';
+import socket from './lib/servers/socket';
 
 const app = express();
-
-app.get('/', (_, res) => {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
-});
-
-app.get('/method=getRoom', (_, res) => {
-    res.send({ id: RoomHandler.getRoom() });
-});
-
-app.get('/method=checkRoom/:id', (req, res) => {
-    res.send({ exists: RoomHandler.checkRoom(req.params.id) });
-});
-
-app.use(express.static('client'));
+const httpServer = new http.Server(app);
+const io = socket(httpServer);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+httpServer.listen(PORT, () => {
+    console.log(`Listening on *:${PORT}`);
 });
