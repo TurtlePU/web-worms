@@ -3,7 +3,7 @@ export default class Room {
     /**
      * Unique identifier in human-readable format.
      */
-    id: string;
+    readonly id: string;
 
     /**
      * @constructor
