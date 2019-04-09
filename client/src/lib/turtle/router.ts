@@ -12,7 +12,7 @@ export interface Router {
      * @param handler - function called when route is navigated. Must accept (path, ...captures of matcher)
      * @returns Router
      */
-    add(matcher: string | RegExp, handler: Function): Router,
+    add(matcher: string | RegExp, handler: Function): this,
 
     /**
      * Removes a given route.
@@ -20,28 +20,28 @@ export interface Router {
      * @param matcher - route or RegEx for a series of routes
      * @returns Router
      */
-    remove(matcher: string | RegExp): Router,
+    remove(matcher: string | RegExp): this,
 
     /**
      * Removes all routes.
      * 
      * @returns Router
      */
-    flush(): Router,
+    flush(): this,
 
     /**
      * Sets listener of address bar. Essential to work.
      * 
      * @returns Router
      */
-    listen(): Router,
+    listen(): this,
     
     /**
      * Stops listening bar change.
      * 
      * @returns Router
      */
-    unlisten(): Router,
+    unlisten(): this,
 
     /**
      * Searches for the given route and sets its view if found. Otherwise navigates to the last saved view.
@@ -49,7 +49,7 @@ export interface Router {
      * @param route
      * @returns Router
      */
-    check(route?: string): Router,
+    check(route?: string): this,
 
     /**
      * Changes the address bar. Router.check() is called automatically if Router listens.
@@ -57,7 +57,7 @@ export interface Router {
      * @param route
      * @returns Router
      */
-    navigate(route: string, forceCheck?: boolean): Router
+    navigate(route: string, forceCheck?: boolean): this
 }
 
 const helper = {
