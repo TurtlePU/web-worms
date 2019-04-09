@@ -20,7 +20,7 @@ export class RoomView extends View<string> {
 
         let back = <HTMLButtonElement> $('back');
         back.addEventListener('click', () => {
-            Router.navigate('');
+            Router.navigate('join');
             this.socket.close();
         });
     }

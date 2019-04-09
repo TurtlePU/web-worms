@@ -15,7 +15,7 @@ export class JoinView extends View<null> {
     private input: HTMLInputElement;
 
     constructor() {
-        super('', html);
+        super('join', html);
         this.joinRoom.bind(this);
     }
 
