@@ -1,7 +1,7 @@
 type RouterEntry = {
     matcher: RegExp,
     handler: Function
-};
+}
 
 /** Interface of a Router. */
 export interface Router {
@@ -94,9 +94,7 @@ const helper = {
     }
 };
 
-/**
- * Singleton Router object for Single-Page Apps.
- */
+/** Singleton Router object for Single-Page Apps. */
 export const Router = {
     add(matcher: string | RegExp, handler: Function) {
         console.log(`Router.add <= '${matcher}'`);
