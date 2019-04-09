@@ -27,14 +27,17 @@ export class View<PropsType> {
         this.ID = ID;
         this.HTML = HTML;
         this.load = this.load.bind(this);
+        console.log(`View.constructor <= { ID: ${ID}, HTML: ... }`);
     }
 
     /**
      * Sets this View on screen. Good practice is to use it as a handler for {@link router.ts#Router}.
      * 
-     * @param props 
+     * @param path - path from which this View is loaded
+     * @param props - properties executed from a path
      */
     load(path: string, props?: PropsType) {
+        console.log(`View.load <= { path: ${path}, props: [${props}] }`);
         console.log(`HTML view <= '${this.ID}'`);
         setView(this.HTML);
         Cookies.set('view', path);
