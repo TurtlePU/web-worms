@@ -18,8 +18,6 @@ export default class RoomView extends View<string> {
 
         this.socket = io();
 
-        Cookies.set('socket', this.socket.id);
-
         this.socket.once('req:getRoom', () => {
             this.socket.emit('res:getRoom', roomID);
         });
@@ -29,5 +27,7 @@ export default class RoomView extends View<string> {
             Router.navigate('join');
             this.socket.close();
         });
+
+        Cookies.set('socket', this.socket.id);
     }
 }
