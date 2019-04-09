@@ -27,8 +27,9 @@ export default class JoinView extends View<null> {
             Router.navigate(`room/${id}`);
         } else {
             let room = skipSpaces(this.input.value);
+            let socket = Cookies.get('socket');
             if (room !== '') {
-                let resp = await fetch(url + `method=checkRoom/${room}`);
+                let resp = await fetch(url + `method=checkRoom$${room}/${socket}`);
                 let exists = (await resp.json()).exists;
                 if (exists) {
                     Router.navigate(`room/${room}`);

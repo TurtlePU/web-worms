@@ -19,8 +19,8 @@ export default function App() {
         res.send({ id: RoomHandler.getRoomID() });
     });
 
-    app.get('/method=checkRoom/:id', (req, res) => {
-        res.send({ exists: RoomHandler.checkRoom(req.params.id) });
+    app.get('/method=checkRoom$:id/:socket', (req, res) => {
+        res.send({ exists: RoomHandler.checkRoom(req.params.id, req.params.socket) });
     });
 
     app.use(express.static('client'));
