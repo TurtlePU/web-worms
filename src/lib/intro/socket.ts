@@ -1,5 +1,8 @@
 import socket from 'socket.io';
 
+import { RoomHandler } from './rooms';
+import Room from '../game/room';
+
 /**
  * Wrapper on Socket server for game needs.
  * 
@@ -11,9 +14,18 @@ export default function IO(server: any) {
 
     io.on('connection', socket => {
         console.log('new socket connected');
+        let room: Room;
+
+        socket.on('res:getRoom', roomID => {
+            room = RoomHandler.getRoom(roomID);
+            room.capture(socket);
+        });
+        socket.emit('req:getRoom');
+
         socket.on('disconnect', () => {
+            room.release(socket);
             console.log('socket disconnected');
-        })
+        });
     });
 
     return io;
