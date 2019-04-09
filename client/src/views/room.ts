@@ -22,11 +22,15 @@ export default class RoomView extends View<string> {
             this.socket.emit('res:getRoom', roomID);
         });
 
+        this.socket.once('auth:reject', () => {
+            Router.navigate('join');
+        });
+
         let back = <HTMLButtonElement> $('back');
-        back.addEventListener('click', () => {
+        back.onclick = () => {
             Router.navigate('join');
             this.socket.close();
-        });
+        };
 
         Cookies.set('socket', this.socket.id);
     }
