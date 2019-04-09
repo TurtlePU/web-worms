@@ -28,6 +28,7 @@ export default class JoinView extends View<null> {
         } else {
             let room = skipSpaces(this.input.value);
             let socket = Cookies.get('socket');
+            console.log(`Saved socket: '${socket}'`);
             if (room !== '') {
                 let resp = await fetch(url + `method=checkRoom$${room}/${socket}`);
                 let exists = (await resp.json()).exists;
@@ -42,16 +43,16 @@ export default class JoinView extends View<null> {
         super.load(path);
 
         this.input = <HTMLInputElement> $('room-id');
-        this.input.addEventListener('keypress', async event => {
+        this.input.onkeypress = async event => {
             if (event.key === 'Enter') {
                 await this.joinRoom();
             }
-        });
+        };
 
         let goButton = <HTMLButtonElement> $('go');
-        goButton.addEventListener('click', async () => await this.joinRoom());
+        goButton.onclick = async () => await this.joinRoom();
 
         let rdButton = <HTMLButtonElement> $('random');
-        rdButton.addEventListener('click', async () => await this.joinRoom(true));
+        rdButton.onclick = async () => await this.joinRoom(true);
     }
 }
