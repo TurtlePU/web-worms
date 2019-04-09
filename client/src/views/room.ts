@@ -8,7 +8,7 @@ const html = /* html */`
     <button id='back'>Back</button>
 `;
 
-export class RoomView extends View<string> {
+export default class RoomView extends View<string> {
     private socket: SocketIOClient.Socket;
 
     constructor() { super('room', html); }

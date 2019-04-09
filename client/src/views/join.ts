@@ -11,7 +11,7 @@ function skipSpaces(str: string) {
     return str.replace(/\s/g, '');
 }
 
-export class JoinView extends View<null> {
+export default class JoinView extends View<null> {
     private input: HTMLInputElement;
 
     constructor() {
@@ -19,7 +19,7 @@ export class JoinView extends View<null> {
         this.joinRoom.bind(this);
     }
 
-    async joinRoom(rnd?: boolean) {
+    private async joinRoom(rnd?: boolean) {
         let url = document.URL.split('#')[0];
         if (rnd) {
             let resp = await fetch(url + 'method=getRoom');

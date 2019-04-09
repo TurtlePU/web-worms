@@ -1,7 +1,7 @@
 import { Router } from './lib/turtle/router.js';
 
-import { JoinView } from './views/join.js';
-import { RoomView } from './views/room.js';
+import JoinView from './views/join.js';
+import RoomView from './views/room.js';
 
 window.addEventListener('load', async () => {
     console.log(`Saved page: '${Cookies.get('view')}'`);
