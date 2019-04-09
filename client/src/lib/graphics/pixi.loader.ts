@@ -9,7 +9,7 @@ export default class Loader extends PIXI.loaders.Loader {
      * 
      * @returns loading Promise
      */
-    async loadAsync() {
+    async loadAsync(): Promise<this> {
         console.log('PIXI.Loader.loadAsync');
         return new Promise((resolve, reject) => {
             this.once('error', reject);
