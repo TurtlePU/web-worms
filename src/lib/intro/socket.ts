@@ -16,7 +16,7 @@ export default function IO(server: any) {
         console.log('new socket connected');
         let room: Room;
 
-        socket.on('res:getRoom', roomID => {
+        socket.once('res:getRoom', roomID => {
             room = RoomHandler.getRoom(roomID);
             room.capture(socket);
         });

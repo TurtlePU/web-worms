@@ -20,7 +20,7 @@ export default class RoomView extends View<string> {
 
         Cookies.set('socket', this.socket.id);
 
-        this.socket.on('req:getRoom', () => {
+        this.socket.once('req:getRoom', () => {
             this.socket.emit('res:getRoom', roomID);
         });
 
