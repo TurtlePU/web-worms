@@ -8,9 +8,16 @@ export interface RoomHandler {
     getRoomID(): string,
 
     /**
+     * @param id ID of a room
      * @returns true if one can join the room, false otherwise
      */
     checkRoom(id: string): boolean,
+
+    /**
+     * @param id ID of a room
+     * @returns Room on given ID. If not found, returns undefined 
+     */
+    getRoom(id: string): Room,
 
     /**
      * Call on start of the game in the room. Removes it from the 'rooms' map
@@ -34,6 +41,10 @@ export const RoomHandler = {
         let newRoom = new Room();
         rooms.set(newRoom.id, newRoom);
         return newRoom.id;
+    },
+
+    getRoom(id: string) {
+        return rooms.get(id);
     },
 
     checkRoom(id: string) {
