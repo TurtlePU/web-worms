@@ -10,9 +10,9 @@ function setView(innerHTML: string) {
 /** Base class of Views ('pages') of Single-Page Apps. */
 export class View<PropsType> {
     /** ID of a View. Good practice is to use it as a route for {@link router.ts#Router}. */
-    ID: string;
+    readonly ID: string;
     /** HTML string to show when view is loaded. */
-    private HTML: string;
+    private readonly HTML: string;
     /** Any props given on load. Good practice is to accept them from {@link router.ts#Router.navigate}. */
     protected props: PropsType;
 
