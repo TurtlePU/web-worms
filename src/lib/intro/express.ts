@@ -12,11 +12,11 @@ export default function App() {
     const app = express();
 
     app.get('/', (_, res) => {
-        res.sendFile(path.join(__dirname, '../../client/index.html'));
+        res.sendFile(path.join(__dirname, '../../../client/index.html'));
     });
 
     app.get('/method=getRoom', (_, res) => {
-        res.send({ id: RoomHandler.getRoom() });
+        res.send({ id: RoomHandler.getRoomID() });
     });
 
     app.get('/method=checkRoom/:id', (req, res) => {
