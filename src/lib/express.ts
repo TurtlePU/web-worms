@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 
-import { RoomHandler } from '../rooms';
+import { RoomHandler } from './rooms';
 
 /**
  * Wrapper on Express server for interaction needs.
@@ -12,7 +12,7 @@ export default function App() {
     const app = express();
 
     app.get('/', (_, res) => {
-        res.sendFile(path.join(__dirname, '../../../client/index.html'));
+        res.sendFile(path.join(__dirname, '../../client/index.html'));
     });
 
     app.get('/method=getRoom', (_, res) => {
