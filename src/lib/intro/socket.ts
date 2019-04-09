@@ -20,12 +20,13 @@ export default function IO(server: any) {
             room = RoomHandler.getRoom(roomID);
             room.capture(socket);
         });
-        socket.emit('req:getRoom');
 
         socket.on('disconnect', () => {
             room.release(socket);
             console.log('socket disconnected');
         });
+
+        socket.emit('req:getRoom');
     });
 
     return io;
