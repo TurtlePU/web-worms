@@ -2,7 +2,7 @@ import ShortID from 'shortid';
 import { Socket } from 'socket.io';
 import { EventEmitter } from 'events';
 
-// Don't forget to emit the events!
+// FIXME: Emit events!
 export type RoomEvent = 'state:lobby' | 'state:full' | 'state:game' | 'state:end';
 
 /** Game room class. */
@@ -11,6 +11,9 @@ export default class Room extends EventEmitter {
      * Unique short identifier.
      */
     readonly ID: string;
+
+    // TODO: Room.sockets
+    // 2 lists: connected & online
 
     /**
      * @constructor
@@ -35,15 +38,21 @@ export default class Room extends EventEmitter {
      * @param socket 
      */
     capture(socket: Socket): void {
-        // TODO
+        // TODO: Room.capture
+        /**
+         *  1. Emit auth:reject if doesn't belong
+         *  2. Add listeners for game events
+         *  3. Push to online, emit events
+         */
     }
-    
+
     /**
      * @param socketID 
      * @returns true if given socket was connected to this game, false otherwise
      */
     has(socketID: string): boolean {
-        // TODO
+        // TODO: Room.has
+        // Check in connected
         return true;
     }
 
@@ -53,6 +62,7 @@ export default class Room extends EventEmitter {
      * @param socket 
      */
     release(socket: Socket): void {
-        // TODO
+        // TODO: Room.release
+        // Move to connected from online, emit events
     }
 };
