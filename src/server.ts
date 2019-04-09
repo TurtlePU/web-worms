@@ -1,7 +1,7 @@
 import http from 'http';
 
-import express from './lib/servers/express';
-import socket from './lib/servers/socket';
+import express from './lib/express';
+import socket from './lib/socket';
 
 const app = express();
 const httpServer = new http.Server(app);
