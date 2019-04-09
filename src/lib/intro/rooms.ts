@@ -8,24 +8,24 @@ export interface RoomHandler {
     getRoomID(): string,
 
     /**
-     * @param id ID of a room
+     * @param ID ID of a room
      * @returns true if one can join the room, false otherwise
      */
-    checkRoom(id: string): boolean,
+    checkRoom(ID: string): boolean,
 
     /**
-     * @param id ID of a room
+     * @param ID ID of a room
      * @returns Room on given ID. If not found, returns undefined 
      */
-    getRoom(id: string): Room,
+    getRoom(ID: string): Room,
 
     /**
      * Call on start of the game in the room. Removes it from the 'rooms' map
      * 
-     * @param id
+     * @param ID
      * @returns true if room was removed, false otherwise 
      */
-    lockRoom(id: string): boolean
+    lockRoom(ID: string): boolean
 }
 
 const rooms = new Map<string, Room>();
@@ -35,23 +35,23 @@ export const RoomHandler = {
     getRoomID() {
         for (let room of rooms.values()) {
             if (!room.full()) {
-                return room.id;
+                return room.ID;
             }
         }
         let newRoom = new Room();
-        rooms.set(newRoom.id, newRoom);
-        return newRoom.id;
+        rooms.set(newRoom.ID, newRoom);
+        return newRoom.ID;
     },
 
-    getRoom(id: string) {
-        return rooms.get(id);
+    getRoom(ID: string) {
+        return rooms.get(ID);
     },
 
-    checkRoom(id: string) {
-        return !rooms.get(id).full();
+    checkRoom(ID: string) {
+        return !rooms.get(ID).full();
     },
 
-    lockRoom(id: string) {
-        return rooms.delete(id);
+    lockRoom(ID: string) {
+        return rooms.delete(ID);
     }
 } as RoomHandler;
