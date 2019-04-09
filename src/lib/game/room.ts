@@ -1,16 +1,18 @@
+import ShortID from 'shortid';
+
 /** Game room class. */
 export default class Room {
     /**
-     * Unique identifier in human-readable format.
+     * Unique short identifier.
      */
-    readonly id: string;
+    readonly ID: string;
 
     /**
      * @constructor
      * Creates new Room with random ID.
      */
     constructor() {
-        //
+        this.ID = ShortID.generate();
     }
 
     /**
