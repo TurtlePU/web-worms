@@ -1,10 +1,20 @@
 import socket, { Socket } from 'socket.io';
+import { RoomHandler } from './rooms';
+import { Requester } from './socket-requester';
 
 class SocketHandler {
     constructor(socket: Socket) {
         console.log('new socket connected');
 
-        // FIXME: requests from client/Join
+        Requester
+            .channel('join')
+            .on('getLobby', RoomHandler.getRoomID)
+            .on('checkLobby', RoomHandler.checkRoom)
+            .on('checkRoom', (roomID: string, socketID: string) => {
+                return RoomHandler.getRoom(roomID) &&
+                       RoomHandler.getRoom(roomID).has(socketID);
+            })
+            .apply(socket);
 
         socket.on('disconnect', () => {
             console.log('socket disconnected');
