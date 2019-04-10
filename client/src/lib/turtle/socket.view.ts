@@ -14,9 +14,13 @@ export class SocketView extends View {
      */
     protected async socketRequest(request: string, ...args: any) {
         return new Promise((resolve, reject) => {
-            this.socket.once(`${request}:res`, resolve);
-            this.socket.emit(`${request}:req`, ...args);
-            setTimeout(() => {
+            let timeout: number;
+            this.socket.once(`${this.ID}:${request}:res`, (...args: any) => {
+                window.clearTimeout(timeout);
+                resolve(...args);
+            });
+            this.socket.emit(`${this.ID}:${request}:req`, ...args);
+            timeout = window.setTimeout(() => {
                 console.log(`${this.ID}.socketRequest: Connection timed out`);
                 reject();
             }, 10 * 1000);
