@@ -1,4 +1,4 @@
-import { SocketView } from "../lib/turtle/socket.view";
+import { SocketView } from '../lib/turtle/socket.view.js';
 
 const html = /* html */`
 `;
