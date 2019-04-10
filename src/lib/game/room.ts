@@ -5,6 +5,7 @@ import { EventEmitter } from 'events';
 // FIXME: Emit events!
 export type RoomEvent = 'state:lobby' | 'state:full' | 'state:game' | 'state:end';
 
+// TODO: Decouple Lobby from Room.
 /** Game room class. */
 export default class Room extends EventEmitter {
     /**
