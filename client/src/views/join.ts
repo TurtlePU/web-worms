@@ -20,23 +20,36 @@ export default class JoinView extends SocketView {
         this.joinLobby.bind(this);
     }
 
+    private async getLobby() {
+        return await this.socketRequest('getLobby');
+    }
+
+    private async checkLobby(lobbyID: string) {
+        return await this.socketRequest('checkLobby', lobbyID);
+    }
+
+    private async checkRoom(roomID: string, socketID: string) {
+        return await this.socketRequest('checkRoom', roomID, socketID);
+    }
+
     private async joinLobby(rnd?: boolean) {
         if (rnd) {
-            let id = await this.socketRequest('join:getLobby');
+            let id = await this.getLobby();
             Router.navigate(`lobby/${id}`);
         } else {
             let lobby = skipSpaces(this.input.value);
             if (lobby !== '') {
-                let exists = await this.socketRequest('join:checkLobby', lobby);
+                let exists = await this.checkLobby(lobby);
                 if (exists) {
                     Router.navigate(`lobby/${lobby}`);
                 } else {
                     let oldSocket = Cookies.get('socket');
-                    let joinable = await this.socketRequest('join:checkRoom', lobby, oldSocket);
+                    let joinable = await this.checkRoom(lobby, oldSocket);
                     if (joinable) {
                         Router.navigate(`room/${lobby}`);
                     } else {
-                        alert(`Lobby or room '${lobby}' not found or inaccessible, try again`);
+                        alert(`Lobby or room '${lobby}' `
+                            + `not found or inaccessible, try again`);
                     }
                 }
             }
