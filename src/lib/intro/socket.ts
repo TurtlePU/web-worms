@@ -1,7 +1,16 @@
-import socket from 'socket.io';
+import socket, { Socket } from 'socket.io';
 
-import { RoomHandler } from './rooms';
-import Room from '../game/room';
+class SocketHandler {
+    constructor(socket: Socket) {
+        console.log('new socket connected');
+
+        // FIXME: requests from client/Join
+
+        socket.on('disconnect', () => {
+            console.log('socket disconnected');
+        });
+    }
+}
 
 /**
  * Wrapper on Socket server for game needs.
@@ -11,23 +20,6 @@ import Room from '../game/room';
  */
 export default function IO(server: any) {
     const io = socket(server);
-
-    io.on('connection', socket => {
-        console.log('new socket connected');
-        let room: Room;
-
-        socket.once('res:getRoom', roomID => {
-            room = RoomHandler.getRoom(roomID);
-            room.capture(socket);
-        });
-
-        socket.on('disconnect', () => {
-            room.release(socket);
-            console.log('socket disconnected');
-        });
-
-        socket.emit('req:getRoom');
-    });
-
+    io.on('connection', socket => new SocketHandler(socket));
     return io;
 }
