@@ -8,13 +8,11 @@ function setView(innerHTML: string) {
 };
 
 /** Base class of Views ('pages') of Single-Page Apps. */
-export class View<PropsType> {
+export class View {
     /** ID of a View. Good practice is to use it as a route for {@link router.ts#Router}. */
     readonly ID: string;
     /** HTML string to show when view is loaded. */
     private readonly HTML: string;
-    /** Any props given on load. Good practice is to accept them from {@link router.ts#Router.navigate}. */
-    protected props: PropsType;
 
     /**
      * @constructor
@@ -34,13 +32,12 @@ export class View<PropsType> {
      * Sets this View on screen. Good practice is to use it as a handler for {@link router.ts#Router}.
      * 
      * @param path - path from which this View is loaded
-     * @param props - properties executed from a path
+     * @param args - any load properties defined in subclasses
      */
-    load(path: string, props?: PropsType) {
-        console.log(`View.load <= { path: ${path}, props: [${props}] }`);
+    load(path: string, ...args: any) {
+        console.log(`View.load <= '${path}'`);
         console.log(`HTML view <= '${this.ID}'`);
         setView(this.HTML);
         Cookies.set('view', path);
-        this.props = props;
     }
 };
