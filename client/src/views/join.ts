@@ -1,9 +1,10 @@
-import { $, View } from '../lib/turtle/main.js';
+import { $ } from '../lib/turtle/main.js';
+import { SocketView } from '../lib/turtle/socket.view.js';
 import { Router } from '../lib/turtle/router.js';
 
 const html = /* html */`
     <h1>Worms II</h1>
-    <input type='text' id='room-id' placeholder='Room ID'>
+    <input type='text' id='lobby-id' placeholder='Lobby/Room ID'>
     <button id='go'>Go</button> <button id='random'>I'm lucky</button>
 `;
 
@@ -11,48 +12,51 @@ function skipSpaces(str: string) {
     return str.replace(/\s/g, '');
 }
 
-export default class JoinView extends View<null> {
+export default class JoinView extends SocketView {
     private input: HTMLInputElement;
 
     constructor() {
         super('join', html);
-        this.joinRoom.bind(this);
+        this.joinLobby.bind(this);
     }
 
-    private async joinRoom(rnd?: boolean) {
-        let url = document.URL.split('#')[0];
+    private async joinLobby(rnd?: boolean) {
         if (rnd) {
-            let resp = await fetch(url + 'method=getRoom');
-            let id = (await resp.json()).id;
-            Router.navigate(`room/${id}`);
+            let id = await this.socketRequest('join:getLobby');
+            Router.navigate(`lobby/${id}`);
         } else {
-            let room = skipSpaces(this.input.value);
-            let socket = Cookies.get('socket');
-            console.log(`Saved socket: '${socket}'`);
-            if (room !== '') {
-                let resp = await fetch(url + `method=checkRoom$${room}/${socket}`);
-                let exists = (await resp.json()).exists;
+            let lobby = skipSpaces(this.input.value);
+            if (lobby !== '') {
+                let exists = await this.socketRequest('join:checkLobby', lobby);
                 if (exists) {
-                    Router.navigate(`room/${room}`);
+                    Router.navigate(`lobby/${lobby}`);
+                } else {
+                    let oldSocket = Cookies.get('socket');
+                    let joinable = await this.socketRequest('join:checkRoom', lobby, oldSocket);
+                    if (joinable) {
+                        Router.navigate(`room/${lobby}`);
+                    } else {
+                        alert(`Lobby or room '${lobby}' not found or inaccessible, try again`);
+                    }
                 }
             }
         }
     }
 
-    load(path: string) {
-        super.load(path);
+    load(path: string, socket: SocketIOClient.Socket) {
+        super.load(path, socket);
 
-        this.input = <HTMLInputElement> $('room-id');
+        this.input = <HTMLInputElement> $('lobby-id');
         this.input.onkeypress = async event => {
             if (event.key === 'Enter') {
-                await this.joinRoom();
+                await this.joinLobby();
             }
         };
 
         let goButton = <HTMLButtonElement> $('go');
-        goButton.onclick = async () => await this.joinRoom();
+        goButton.onclick = async () => await this.joinLobby();
 
         let rdButton = <HTMLButtonElement> $('random');
-        rdButton.onclick = async () => await this.joinRoom(true);
+        rdButton.onclick = async () => await this.joinLobby(true);
     }
 }
