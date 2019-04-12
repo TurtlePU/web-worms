@@ -1,14 +1,13 @@
 import socket, { Socket } from 'socket.io';
 import { LobbyHandler } from './lobby/handler';
 import { RoomHandler } from './room/handler';
-import { Requester } from './requester';
+import Requester from './requester';
 
 class SocketHandler {
     constructor(socket: Socket) {
         console.log('new socket connected');
 
-        Requester
-            .channel('join')
+        new Requester('join')
             .on('getLobby', LobbyHandler.getLobbyID)
             .on('checkLobby', LobbyHandler.checkLobby)
             .on('checkRoom', (roomID: string, socketID: string) => {

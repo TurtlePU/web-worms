@@ -1,57 +1,46 @@
 import { Socket } from 'socket.io';
 
-/** Interface for Requester. */
-export interface Requester {
-    /**
-     * Sets channel on which to add requests.
-     * @param name - name of the channel
-     * @returns Requester
-     */
-    channel(name: string): this,
-
-    /**
-     * Adds a request on the channel.
-     * @param name - name of the request
-     * @param handler - request executor
-     * @returns Requester
-     */
-    on(name: string, handler: (...args: any[]) => any): this,
-
-    /**
-     * Adds request handlers to the socket. All the added handlers are flushed from the Requester.
-     * @param socket - socket to add handlers to
-     */
-    apply(socket: Socket): void
-}
-
 type RequestType = {
     name: string,
     handler: (...args: any[]) => any
 }
 
-const helper = {
-    channel: '',
-    requests: [] as RequestType[]
-};
+/** Interface for Requester. */
+export default class Requester {
+    private channel: string;
+    private requests: RequestType[];
 
-/** Singleton to serialise setting of requests from a socket. */
-export const Requester = {
-    channel(name: string): Requester {
-        helper.channel = name;
-        return Requester;
-    },
+    /**
+     * @constructor
+     * @param channel - name of a request channel
+     */
+    constructor(channel: string) {
+        this.channel = channel;
+        this.requests = [];
+    }
 
-    on(name: string, handler: (...args: any[]) => any): Requester {
-        helper.requests.push({ name, handler });
-        return Requester;
-    },
+    /**
+     * Adds a request on the channel.
+     * @param name - name of the request
+     * @param handler - request executor
+     * @returns @this
+     */
+    on(name: string, handler: (...args: any[]) => any) {
+        this.requests.push({ name, handler });
+        return this;
+    }
 
+    /**
+     * Adds request handlers to the socket. After applying, Requester won't work.
+     * @param socket - socket to add handlers to
+     */
     apply(socket: Socket) {
-        for (let { name, handler } of helper.requests) {
-            socket.on(`${helper.channel}:${name}:req`, (...args) => {
-                socket.emit(`${helper.channel}:${name}:res`, handler(...args));
+        for (let { name, handler } of this.requests) {
+            socket.on(`${this.channel}:${name}:req`, (...args) => {
+                socket.emit(`${this.channel}:${name}:res`, handler(...args));
             });
         }
-        helper.requests = [];
+        this.channel = '';
+        this.requests = [];
     }
-} as Requester;
+}
