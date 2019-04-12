@@ -1,18 +1,18 @@
 import socket from 'socket.io';
 
-import { LobbyHandler } from './lobby/handler';
-import { RoomHandler } from './room/handler';
+import { LobbyPool } from './lobby/pool';
+import { RoomPool } from './room/pool';
 import Requester from './requester';
 
 function handleSocket(socket: socket.Socket) {
     console.log('new socket connected');
 
     new Requester('join')
-        .on('getLobby', LobbyHandler.getLobbyID)
-        .on('checkLobby', LobbyHandler.checkLobby)
+        .on('getLobby', LobbyPool.getLobbyID)
+        .on('checkLobby', LobbyPool.checkLobby)
         .on('checkRoom', (roomID: string, socketID: string) => {
-            return RoomHandler.getRoom(roomID) &&
-                    RoomHandler.getRoom(roomID).has(socketID);
+            return RoomPool.getRoom(roomID) &&
+                   RoomPool.getRoom(roomID).has(socketID);
         })
         .apply(socket);
 

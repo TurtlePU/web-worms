@@ -1,7 +1,7 @@
 import Lobby from './class';
 
-/** Interface of LobbyHandler. */
-export interface LobbyHandler {
+/** Interface of LobbyPool. */
+export interface ILobbyPool {
     /**
      * @returns ID of non-full lobby
      */
@@ -20,7 +20,7 @@ const helper = {
 };
 
 /** Singleton lobby manager. */
-export const LobbyHandler = {
+export const LobbyPool = {
     getLobbyID() {
         if (helper.lobby.size === 0) {
             let lb = new Lobby();
@@ -32,4 +32,4 @@ export const LobbyHandler = {
     checkLobby(lobbyID: string) {
         return helper.lobby.has(lobbyID);
     }
-} as LobbyHandler;
+} as ILobbyPool;

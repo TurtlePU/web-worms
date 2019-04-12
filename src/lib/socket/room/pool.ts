@@ -1,7 +1,7 @@
 import Room from './class';
 
-/** Interface of a RoomHandler. */
-export interface RoomHandler {
+/** Interface of a RoomPool. */
+export interface IRoomPool {
     /**
      * Gets room by ID.
      * @param roomID 
@@ -13,8 +13,8 @@ export interface RoomHandler {
 const rooms = new Map<string, Room>();
 
 /** Singleton Room manager. */
-export const RoomHandler = {
+export const RoomPool = {
     getRoom(roomID: string) {
         return rooms.get(roomID);
     }
-} as RoomHandler;
+} as IRoomPool;
