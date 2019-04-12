@@ -7,7 +7,7 @@ import socket from './lib/socket/main';
 const app = express();
 
 app.get('/', (_, res) => {
-    res.sendFile(path.join(__dirname, '../../client/index.html'));
+    res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 app.use(express.static('client'));
