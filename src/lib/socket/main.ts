@@ -1,6 +1,6 @@
 import socket from 'socket.io';
 
-import { LobbyPool } from './lobby/pool';
+import Lobby from './lobby';
 import { RoomPool } from './room/pool';
 import Requester from './requester';
 
@@ -8,8 +8,8 @@ function handleSocket(socket: socket.Socket) {
     console.log('new socket connected');
 
     new Requester('join')
-        .on('getLobby', LobbyPool.getLobbyID)
-        .on('checkLobby', LobbyPool.checkLobby)
+        .on('getLobby', Lobby.instanceID)
+        .on('checkLobby', Lobby.check)
         .on('checkRoom', (roomID: string, socketID: string) => {
             return RoomPool.getRoom(roomID) &&
                    RoomPool.getRoom(roomID).has(socketID);

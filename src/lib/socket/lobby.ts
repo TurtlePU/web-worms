@@ -35,7 +35,7 @@ export default class Lobby {
         return Lobby.pool.keys().next().value;
     }
 
-    static test(ID: string) {
+    static check(ID: string) {
         return Lobby.pool.has(ID);
     }
 
