@@ -6,6 +6,7 @@ export default class Lobby {
     /** Available lobbies. */
     private static pool = new Map<string, Lobby>();
 
+    // TODO: use filled lobbies
     /** Filled lobbies. */
     private static full = new Map<string, Lobby>();
 
@@ -27,7 +28,7 @@ export default class Lobby {
         this.sockets = [];
     }
 
-    static instanceID() {
+    static ID() {
         if (Lobby.pool.size === 0) {
             let lobby = new Lobby();
             Lobby.pool.set(lobby.ID, lobby);
@@ -35,7 +36,7 @@ export default class Lobby {
         return Lobby.pool.keys().next().value;
     }
 
-    static check(ID: string) {
+    static has(ID: string) {
         return Lobby.pool.has(ID);
     }
 

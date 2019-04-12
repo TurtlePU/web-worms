@@ -8,8 +8,8 @@ function handleSocket(socket: socket.Socket) {
     console.log('new socket connected');
 
     new Requester('join')
-        .on('getLobby', Lobby.instanceID)
-        .on('checkLobby', Lobby.check)
+        .on('getLobby', Lobby.ID)
+        .on('checkLobby', Lobby.has)
         .on('checkRoom', (roomID: string, socketID: string) => {
             return RoomPool.getRoom(roomID) &&
                    RoomPool.getRoom(roomID).has(socketID);
