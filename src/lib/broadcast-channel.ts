@@ -29,6 +29,7 @@ export default class BroadcastChannel {
 
     /**
      * Adds broadcast-start listeners to the socket. Can be used multiple times.
+     * !!! Important: events are broadcasted for a first room of socket. 
      * @param socket - socket to add listeners to
      */
     plug(socket: socket.Socket) {
