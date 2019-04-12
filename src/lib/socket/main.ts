@@ -1,10 +1,15 @@
 import socket from 'socket.io';
 
 import Lobby from './lobby';
-import Room from './room';
+import Room  from './room';
+
 import Requester from './requester';
 
-function handleSocket(socket: socket.Socket) {
+/**
+ * Adds event listeners to the given socket.
+ * @param socket - Socket passed on 'connection' event
+ */
+export default function(socket: socket.Socket) {
     console.log('new socket connected');
 
     new Requester('join')
@@ -19,16 +24,4 @@ function handleSocket(socket: socket.Socket) {
     socket.on('disconnect', () => {
         console.log('socket disconnected');
     });
-}
-
-/**
- * Wrapper on Socket server for game needs.
- * 
- * @param server Server to retrieve events from
- * @returns Socket server with binded game events
- */
-export default function IO(server: any) {
-    const io = socket(server);
-    io.on('connection', handleSocket);
-    return io;
 }
