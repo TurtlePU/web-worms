@@ -1,6 +1,7 @@
 import socket, { Socket } from 'socket.io';
-import { RoomHandler } from './rooms';
-import { Requester } from './socket-requester';
+import { LobbyHandler } from './lobby/lobbies';
+import { RoomHandler } from '../game/room/handler';
+import { Requester } from './requester';
 
 class SocketHandler {
     constructor(socket: Socket) {
@@ -8,8 +9,8 @@ class SocketHandler {
 
         Requester
             .channel('join')
-            .on('getLobby', RoomHandler.getRoomID)
-            .on('checkLobby', RoomHandler.checkRoom)
+            .on('getLobby', LobbyHandler.getLobbyID)
+            .on('checkLobby', LobbyHandler.checkLobby)
             .on('checkRoom', (roomID: string, socketID: string) => {
                 return RoomHandler.getRoom(roomID) &&
                        RoomHandler.getRoom(roomID).has(socketID);
