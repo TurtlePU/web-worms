@@ -6,15 +6,14 @@ export default class Lobby {
     /** Available lobbies. */
     private static pool = new Map<string, Lobby>();
 
-    // TODO: use filled lobbies
     /** Filled lobbies. */
     private static full = new Map<string, Lobby>();
 
     /** Maximum number of players. */
-    static readonly CAPACITY = 4;
+    private static readonly CAPACITY = 4;
 
     /** Unique short identifier. */
-    readonly ID: string;
+    private readonly ID: string;
 
     /** Sockets connected to the lobby. */
     private sockets: Socket[];
@@ -28,6 +27,9 @@ export default class Lobby {
         this.sockets = [];
     }
 
+    /**
+     * @returns ID of a joinable lobby (if there are none, creates new)
+     */
     static ID() {
         if (Lobby.pool.size === 0) {
             let lobby = new Lobby();
@@ -36,6 +38,10 @@ export default class Lobby {
         return Lobby.pool.keys().next().value;
     }
 
+    /**
+     * @param ID - ID of some lobby
+     * @returns true if given lobby is joinable, false otherwise
+     */
     static has(ID: string) {
         return Lobby.pool.has(ID);
     }
@@ -43,19 +49,21 @@ export default class Lobby {
     /**
      * Adds given socket to the lobby list.
      * @param socket
+     * @returns true if socket was pushed, false if lobby is full
      */
-    push(socket: Socket) {
-        if (this.sockets.length === Lobby.CAPACITY) {
-            throw new RangeError('Lobby is full');
+    private push(socket: Socket) {
+        if (this.full()) {
+            return false;
         } else {
             this.sockets.push(socket);
+            return true;
         }
     }
 
     /**
      * @returns true if lobby is full, false otherwise
      */
-    full() {
+    private full() {
         return this.sockets.length === Lobby.CAPACITY;
     }
 
@@ -64,11 +72,13 @@ export default class Lobby {
      * @param socket
      * @returns true if socket was removed, false if not found
      */
-    remove(socket: Socket) {
-        let index = this.sockets.findIndex(conn => socket === conn);
-        if (index !== -1) {
+    private remove(socket: Socket) {
+        let index = this.sockets.findIndex(element => {
+            return element.id == socket.id;
+        });
+        if (index != -1) {
             this.sockets.splice(index, 1);
         }
-        return index !== -1;
+        return index != -1;
     }
 };
