@@ -9,8 +9,7 @@ const joinChannel = new RequestChannel('join')
     .on('getLobby', Lobby.ID)
     .on('checkLobby', Lobby.has)
     .on('checkRoom', (roomID: string, socketID: string) => {
-        return Room.has(roomID) &&
-            Room.get(roomID).had(socketID);
+        return Room.has(roomID) && Room.get(roomID).had(socketID);
     });
 
 /**
