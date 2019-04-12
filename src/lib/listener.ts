@@ -19,7 +19,7 @@ const joinChannel = new RequestChannel('join')
 export default function(socket: socket.Socket) {
     console.log('new socket connected');
 
-    joinChannel.apply(socket);
+    joinChannel.plug(socket);
 
     socket.on('disconnect', () => {
         console.log('socket disconnected');

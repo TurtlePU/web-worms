@@ -34,7 +34,7 @@ export default class RequestChannel {
      * Adds request listeners to the socket. Can be used multiple times.
      * @param socket - socket to add listeners to
      */
-    apply(socket: Socket) {
+    plug(socket: Socket) {
         for (let { name, handler } of this.requests) {
             socket.on(`${this.channel}:${name}:req`, (...args) => {
                 socket.emit(`${this.channel}:${name}:res`, handler(...args));
