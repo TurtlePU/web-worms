@@ -1,6 +1,6 @@
 import socket, { Socket } from 'socket.io';
 import { LobbyHandler } from './lobby/lobbies';
-import { RoomHandler } from '../game/room/handler';
+import { RoomHandler } from './room/handler';
 import { Requester } from './requester';
 
 class SocketHandler {
