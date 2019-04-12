@@ -5,7 +5,7 @@ type RequestType = {
     handler: (...args: any[]) => any
 }
 
-/** Interface for Requester. */
+/** Serialises requests to server via socket.io. */
 export default class Requester {
     private channel: string;
     private requests: RequestType[];
