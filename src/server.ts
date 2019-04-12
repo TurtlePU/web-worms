@@ -3,7 +3,7 @@ import http    from 'http';
 import path    from 'path';
 import socket  from 'socket.io';
 
-import listen  from './lib/main';
+import listen  from './lib/listener';
 
 const app = express();
 app.get('/', (_, res) => {
