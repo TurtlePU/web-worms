@@ -5,9 +5,9 @@ type RequestType = {
     handler: (...args: any[]) => any
 }
 
-/** Serialises requests to server via socket.io. */
-export default class Requester {
-    private channel: string;
+/** Request channel based on Socket.io. */
+export default class RequestChannel {
+    private readonly channel: string;
     private requests: RequestType[];
 
     /**
@@ -20,9 +20,9 @@ export default class Requester {
     }
 
     /**
-     * Adds a request on the channel.
+     * Adds a request listener on the channel.
      * @param name - name of the request
-     * @param handler - request executor
+     * @param handler - request listener
      * @returns @this
      */
     on(name: string, handler: (...args: any[]) => any) {
@@ -31,17 +31,14 @@ export default class Requester {
     }
 
     /**
-     * Adds request handlers to the socket. After applying, Requester won't work.
-     * @param socket - socket to add handlers to
+     * Adds request listeners to the socket. Can be used multiple times.
+     * @param socket - socket to add listeners to
      */
     apply(socket: Socket) {
-        let channel = this.channel;
         for (let { name, handler } of this.requests) {
-            socket.on(`${channel}:${name}:req`, (...args) => {
-                socket.emit(`${channel}:${name}:res`, handler(...args));
+            socket.on(`${this.channel}:${name}:req`, (...args) => {
+                socket.emit(`${this.channel}:${name}:res`, handler(...args));
             });
         }
-        this.channel = '';
-        this.requests = [];
     }
 }
