@@ -13,6 +13,7 @@ export class SocketView extends View {
      * @param args - request parameters
      */
     protected async socketRequest(request: string, ...args: any) {
+        console.log(`${this.ID}:${request}`);
         return new Promise((resolve, reject) => {
             let timeout: number;
             this.socket.once(`${this.ID}:${request}:res`, (...args: any) => {
@@ -21,8 +22,7 @@ export class SocketView extends View {
             });
             this.socket.emit(`${this.ID}:${request}:req`, ...args);
             timeout = window.setTimeout(() => {
-                console.log(`${this.ID}.socketRequest: Connection timed out`);
-                reject();
+                reject(`${this.ID}:${request}: Connection timed out`);
             }, 10 * 1000);
         });
     }
