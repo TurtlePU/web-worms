@@ -20,7 +20,7 @@ export default class BroadcastChannel {
     /**
      * Adds new event(s) for subscribers to listen to.
      * @param events - string identifier(s) of an event
-     * @returns @this
+     * @returns this BroadcastChannel
      */
     open(...events: string[]) {
         this.events.push(...events);
@@ -29,7 +29,10 @@ export default class BroadcastChannel {
 
     /**
      * Adds broadcast-start listeners to the socket. Can be used multiple times.
-     * !!! Important: events are broadcasted for a first room of socket. 
+     * 
+     * !!! Important: events are broadcasted for a first room of socket.
+     * 
+     * !!! Important: with original args, ID of a broadcaster is sent too (and sent first).
      * @param socket - socket to add listeners to
      */
     plug(socket: socket.Socket) {
@@ -37,7 +40,7 @@ export default class BroadcastChannel {
             socket.on(`${this.channel}:${event}:send`, (...args: any[]) => {
                 socket.server
                     .to(socket.rooms[0])
-                    .emit(`${this.channel}:${event}:receive`, ...args);
+                    .emit(`${this.channel}:${event}:receive`, socket.id, ...args);
             });
         });
     }
