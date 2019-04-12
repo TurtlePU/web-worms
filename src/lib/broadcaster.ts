@@ -1,28 +1,42 @@
-import socket from "socket.io";
+import socket from 'socket.io';
 
-// TODO: Broadcaster
-/** Broadcasts servers for a room. */
-export default class Broadcaster {
-    private channel: string;
+/** Broadcast channel for a room based on Socket.io. */
+export default class BroadcastChannel {
+    /** Name of a channel. */
+    private readonly channel: string;
+
+    /** List of channel's events. */
     private events: string[];
-    private io: socket.Server;
 
-    // TODO: add room
-    constructor(io: socket.Server, channel: string) {
+    /**
+     * @constructor
+     * @param channel - name of a channel 
+     */
+    constructor(channel: string) {
         this.channel = channel;
         this.events = [];
-        this.io = io;
     }
 
-    on(event: string) {
-        this.events.push(event);
+    /**
+     * Adds new event(s) for subscribers to listen to.
+     * @param events - string identifier(s) of an event
+     * @returns @this
+     */
+    open(...events: string[]) {
+        this.events.push(...events);
+        return this;
     }
 
-    apply(socket: socket.Socket) {
-        let channel = this.channel;
+    /**
+     * Adds broadcast-start listeners to the socket. Can be used multiple times.
+     * @param socket - socket to add listeners to
+     */
+    plug(socket: socket.Socket) {
         this.events.forEach(event => {
-            socket.on(`${channel}:${event}:send`, (...args: any[]) => {
-                this.io.emit(`${channel}:${event}:receive`, ...args);
+            socket.on(`${this.channel}:${event}:send`, (...args: any[]) => {
+                socket.server
+                    .to(socket.rooms[0])
+                    .emit(`${this.channel}:${event}:receive`, ...args);
             });
         });
     }
