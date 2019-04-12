@@ -1,7 +1,7 @@
 import socket from 'socket.io';
 
 import Lobby from './lobby';
-import { RoomPool } from './room/pool';
+import Room from './room';
 import Requester from './requester';
 
 function handleSocket(socket: socket.Socket) {
@@ -11,8 +11,8 @@ function handleSocket(socket: socket.Socket) {
         .on('getLobby', Lobby.ID)
         .on('checkLobby', Lobby.has)
         .on('checkRoom', (roomID: string, socketID: string) => {
-            return RoomPool.getRoom(roomID) &&
-                   RoomPool.getRoom(roomID).has(socketID);
+            return Room.has(roomID) &&
+                   Room.get(roomID).had(socketID);
         })
         .apply(socket);
 
