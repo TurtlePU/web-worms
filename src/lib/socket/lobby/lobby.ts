@@ -1,5 +1,5 @@
 import ShortID from 'shortid';
-import { Socket } from "socket.io";
+import { Socket } from 'socket.io';
 
 /** Game lobby class. */
 export default class Lobby {
