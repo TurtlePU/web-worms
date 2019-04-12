@@ -1,5 +1,5 @@
 import socket, { Socket } from 'socket.io';
-import { LobbyHandler } from './lobby/lobbies';
+import { LobbyHandler } from './lobby/handler';
 import { RoomHandler } from './room/handler';
 import { Requester } from './requester';
 
