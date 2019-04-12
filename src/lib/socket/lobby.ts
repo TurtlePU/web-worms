@@ -3,6 +3,7 @@ import { Socket } from 'socket.io';
 
 /** Game lobby class. */
 export default class Lobby {
+/** STATIC */
     /** Available lobbies. */
     private static pool = new Map<string, Lobby>();
 
@@ -11,21 +12,6 @@ export default class Lobby {
 
     /** Maximum number of players. */
     private static readonly CAPACITY = 4;
-
-    /** Unique short identifier. */
-    private readonly ID: string;
-
-    /** Sockets connected to the lobby. */
-    private sockets: Socket[];
-
-    /**
-     * @constructor
-     * Creates new Lobby with random ID.
-     */
-    private constructor() {
-        this.ID = ShortID.generate();
-        this.sockets = [];
-    }
 
     /**
      * @returns ID of a joinable lobby (if there are none, creates new)
@@ -44,6 +30,22 @@ export default class Lobby {
      */
     static has(ID: string) {
         return Lobby.pool.has(ID);
+    }
+
+/** OBJECT */
+    /** Unique short identifier. */
+    private readonly ID: string;
+
+    /** Sockets connected to the lobby. */
+    private sockets: Socket[];
+
+    /**
+     * @constructor
+     * Creates new Lobby with random ID.
+     */
+    private constructor() {
+        this.ID = ShortID.generate();
+        this.sockets = [];
     }
 
     /**
