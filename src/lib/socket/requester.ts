@@ -35,9 +35,10 @@ export default class Requester {
      * @param socket - socket to add handlers to
      */
     apply(socket: Socket) {
+        let channel = this.channel;
         for (let { name, handler } of this.requests) {
-            socket.on(`${this.channel}:${name}:req`, (...args) => {
-                socket.emit(`${this.channel}:${name}:res`, handler(...args));
+            socket.on(`${channel}:${name}:req`, (...args) => {
+                socket.emit(`${channel}:${name}:res`, handler(...args));
             });
         }
         this.channel = '';
