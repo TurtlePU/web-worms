@@ -1,4 +1,4 @@
-///<reference path='../socket.io.d.ts'/>
+///<reference path='../socket/socket.io.d.ts'/>
 
 import { View } from './main.js';
 
