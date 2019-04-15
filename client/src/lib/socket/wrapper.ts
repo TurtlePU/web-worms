@@ -26,7 +26,7 @@ socket.request = async (request: string, ...args: any[]) => {
     });
 };
 
-export function init() {
+export function initSocket() {
     socket = io();
 }
 
