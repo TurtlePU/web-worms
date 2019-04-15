@@ -28,6 +28,17 @@ socket.request = async (request: string, ...args: any[]) => {
 
 export function initSocket() {
     socket = io();
+
+    socket.cast = (event: string, ...args: any[]) => {
+        socket.emit(`${channel}:${event}:send`, ...args);
+        return socket;
+    }
+
+    socket.onCast = (event: string, fn: Function) => {
+        let fullname = `${channel}:${event}:receive`;
+        socket.on(fullname, fn);
+        return socket;
+    }
 }
 
 export default socket;
