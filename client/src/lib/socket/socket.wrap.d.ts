@@ -2,17 +2,17 @@ declare namespace SocketIOClient {
     interface Socket {
         /**
          * Configs socket to the given channel.
-         * @param name 
-         * @returns this
+         * @param name - name of a channel
+         * @returns - this
          */
         channel(name: string): this,
 
         /**
-         * Sends socket request.
-         * @param name
-         * @param args
+         * Sends socket request via preconfigged channel.
+         * @param request - request name
+         * @param args - any params of request
          * @returns Promise resolving with the request result
          */
-        request(name: string, ...args: any[]): Promise<any>
+        request(request: string, ...args: any[]): Promise<any>
     }
 }
