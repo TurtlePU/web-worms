@@ -1,9 +1,9 @@
-import { SocketView } from '../lib/turtle/socket.view.js';
+import { View } from '../lib/turtle/main.js';
 
 const html = /* html */`
 `;
 
-export default class RoomView extends SocketView {
+export default class RoomView extends View {
     // TODO: RoomView
     constructor() {
         super('room', html);

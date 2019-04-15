@@ -1,5 +1,4 @@
-import { $ } from '../lib/turtle/main.js';
-import { SocketView } from '../lib/turtle/socket.view.js';
+import { $, View } from '../lib/turtle/main.js';
 import { Router } from '../lib/turtle/router.js';
 
 const html = /* html */`
@@ -7,14 +6,14 @@ const html = /* html */`
     <button id='back'>Back</button>
 `;
 
-export default class LobbyView extends SocketView {
+export default class LobbyView extends View {
     // TODO: LobbyView
     private lobbyID: string;
 
     constructor() { super('lobby', html); }
 
-    load(path: string, socket: SocketIOClient.Socket, lobbyID: string) {
-        super.load(path, socket);
+    load(path: string, lobbyID: string) {
+        super.load(path);
         this.lobbyID = lobbyID;
 
         let back = <HTMLButtonElement> $('back');

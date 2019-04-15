@@ -1,6 +1,7 @@
-import { $ } from '../lib/turtle/main.js';
-import { SocketView } from '../lib/turtle/socket.view.js';
-import { Router } from '../lib/turtle/router.js';
+import socket from '../lib/socket/wrapper.js';
+
+import { $, View } from '../lib/turtle/main.js';
+import { Router  } from '../lib/turtle/router.js';
 
 const html = /* html */`
     <h1>Worms II</h1>
@@ -12,7 +13,7 @@ function skipSpaces(str: string) {
     return str.replace(/\s/g, '');
 }
 
-export default class JoinView extends SocketView {
+export default class JoinView extends View {
     private input: HTMLInputElement;
 
     constructor() {
@@ -21,15 +22,21 @@ export default class JoinView extends SocketView {
     }
 
     private async getLobby() {
-        return await this.socketRequest('getLobby');
+        return await socket
+            .channel(this.ID)
+            .request('getLobby');
     }
 
     private async checkLobby(lobbyID: string) {
-        return await this.socketRequest('checkLobby', lobbyID);
+        return await socket
+            .channel(this.ID)
+            .request('checkLobby', lobbyID);
     }
 
     private async checkRoom(roomID: string, socketID: string) {
-        return await this.socketRequest('checkRoom', roomID, socketID);
+        return await socket
+            .channel(this.ID)
+            .request('checkRoom', roomID, socketID);
     }
 
     private async joinLobby(rnd?: boolean) {
@@ -56,8 +63,8 @@ export default class JoinView extends SocketView {
         }
     }
 
-    load(path: string, socket: SocketIOClient.Socket) {
-        super.load(path, socket);
+    load(path: string) {
+        super.load(path);
 
         this.input = <HTMLInputElement> $('lobby-id');
         this.input.onkeypress = async event => {
