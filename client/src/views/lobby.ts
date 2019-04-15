@@ -1,3 +1,5 @@
+import socket from '../lib/socket/wrapper.js';
+
 import { $, View } from '../lib/turtle/main.js';
 import { Router } from '../lib/turtle/router.js';
 
@@ -10,7 +12,9 @@ export default class LobbyView extends View {
     // TODO: LobbyView
     private lobbyID: string;
 
-    constructor() { super('lobby', html); }
+    constructor() {
+        super('lobby', html);
+    }
 
     load(path: string, lobbyID: string) {
         super.load(path);
