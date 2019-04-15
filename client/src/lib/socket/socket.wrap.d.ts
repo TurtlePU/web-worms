@@ -3,7 +3,7 @@ declare namespace SocketIOClient {
         /**
          * Configs socket to the given channel.
          * @param name - name of a channel
-         * @returns - this
+         * @returns this
          */
         channel(name: string): this,
 
