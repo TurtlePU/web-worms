@@ -1,5 +1,5 @@
 import { initSocket } from './lib/socket/wrapper.js';
-import {   Router   } from './lib/turtle/router.js';
+import Router from './lib/turtle/router.js';
 
 import JoinView  from './views/join.js';
 import LobbyView from './views/lobby.js';

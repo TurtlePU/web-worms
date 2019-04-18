@@ -1,10 +1,14 @@
+// Single-page hash router.
+// Made by Turtle, P.U. in 2019
+// Based on http://krasimirtsonev.com/blog/article/A-modern-JavaScript-router-in-100-lines-history-api-pushState-hash-url
+
 type RouterEntry = {
     matcher: RegExp,
     handler: Function
 }
 
 /** Interface of a Router. */
-export interface Router {
+interface Router {
     /**
      * Adds new route to be controlled by Router.
      * 
@@ -60,6 +64,7 @@ export interface Router {
     navigate(route: string, forceCheck?: boolean): this
 }
 
+/** Private fields of a Router. */
 const helper = {
     routes: [] as RouterEntry[],
     root: '/',
@@ -95,7 +100,7 @@ const helper = {
 };
 
 /** Singleton Router object for Single-Page Apps. */
-export const Router = {
+const Router = {
     add(matcher: string | RegExp, handler: Function) {
         console.log(`Router.add <= '${matcher}'`);
         matcher = helper.toRegExp(matcher);
@@ -171,3 +176,5 @@ export const Router = {
         return Router;
     }
 } as Router;
+
+export default Router;
