@@ -1,4 +1,4 @@
-import { socket } from '../lib/socket/wrapper.js';
+import socket from '../lib/socket/wrapper.js';
 
 import { $, View } from '../lib/turtle/main.js';
 import Router from '../lib/turtle/router.js';
