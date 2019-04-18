@@ -1,9 +1,15 @@
 import express from 'express';
 import http    from 'http';
+import os      from 'os';
 import path    from 'path';
 import socket  from 'socket.io';
 
 import listen  from './lib/listener';
+
+import { initIdGenerator } from './lib/id-generator';
+import digits from './data/id-digits.json';
+
+initIdGenerator(digits, 3);
 
 const app = express();
 app.get('/', (_, res) => {
@@ -12,9 +18,15 @@ app.get('/', (_, res) => {
 app.use(express.static('client'));
 
 const httpServer = new http.Server(app);
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT) || 3000;
+const interfaces = os.networkInterfaces();
+
 httpServer.listen(PORT, () => {
-    console.log(`Listening on *:${PORT}`);
+    Object.values(interfaces).forEach(ifaceInfo => {
+        ifaceInfo.forEach(iface => {
+            console.log(`Listening on ${iface.address}:${PORT}`);
+        });
+    });
 });
 
 const io = socket(httpServer);

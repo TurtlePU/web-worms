@@ -1,5 +1,6 @@
-import ShortID from 'shortid';
 import { Socket } from 'socket.io';
+
+import idGenerator from './id-generator';
 
 /** Game lobby class. */
 export default class Lobby {
@@ -44,7 +45,7 @@ export default class Lobby {
      * Creates new Lobby with random ID.
      */
     private constructor() {
-        this.ID = ShortID.generate();
+        this.ID = idGenerator();
         this.sockets = [];
     }
 
