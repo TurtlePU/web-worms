@@ -21,7 +21,7 @@ declare namespace SocketIOClient {
          * @param fn - event handler
          * @returns this
          */
-        onCast(event: string, fn: Function): this,
+        onCast(event: string, fn: Function): SocketIOClient.Emitter,
 
         /**
          * Sends socket request via preconfigged channel.

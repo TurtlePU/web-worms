@@ -1,44 +1,48 @@
 ///<reference path='socket.io.d.ts'/>
 ///<reference path='socket.wrap.d.ts'/>
 
-var socket: SocketIOClient.Socket;
-var channel = '';
-
-socket.channel = (name: string) => {
-    channel = name;
-    return socket;
+const field = {
+    channel: '',
+    initialized: false
 };
 
-socket.request = async (request: string, ...args: any[]) => {
-    let fullname = `${channel}:${request}`;
-    console.log(`socket.request <= ${fullname}`);
-    return new Promise((resolve, reject) => {
-        let timeout: number;
-        socket.once(`${fullname}:res`, (...args: any) => {
-            window.clearTimeout(timeout);
-            console.log(`socket.request =>`, ...args);
-            resolve(...args);
-        });
-        socket.emit(`${fullname}:req`, ...args);
-        timeout = window.setTimeout(() => {
-            reject(`${fullname}: Connection timed out`);
-        }, 10 * 1000);
-    });
-};
+export var socket: SocketIOClient.Socket;
 
 export function initSocket() {
-    socket = io();
+    if (!field.initialized) {
+        field.initialized = true;
 
-    socket.cast = (event: string, ...args: any[]) => {
-        socket.emit(`${channel}:${event}:send`, ...args);
-        return socket;
+        socket = io();
+
+        socket.channel = (name: string) => {
+            field.channel = name;
+            return socket;
+        };
+
+        socket.request = async (request: string, ...args: any[]) => {
+            let fullname = `${field.channel}:${request}`;
+            console.log(`socket.request <= ${fullname}`);
+            return new Promise((resolve, reject) => {
+                let timeout: number;
+                socket.once(`${fullname}:res`, (...args: any) => {
+                    window.clearTimeout(timeout);
+                    console.log(`socket.request =>`, ...args);
+                    resolve(...args);
+                });
+                socket.emit(`${fullname}:req`, ...args);
+                timeout = window.setTimeout(() => {
+                    reject(`${fullname}: Connection timed out`);
+                }, 10 * 1000);
+            });
+        };
+
+        socket.cast = (event: string, ...args: any[]) => {
+            return socket.emit(`${field.channel}:${event}:send`, ...args);
+        };
+
+        socket.onCast = (event: string, fn: Function) => {
+            let fullname = `${field.channel}:${event}:receive`;
+            return socket.on(fullname, fn);
+        };
     }
-
-    socket.onCast = (event: string, fn: Function) => {
-        let fullname = `${channel}:${event}:receive`;
-        socket.on(fullname, fn);
-        return socket;
-    }
-}
-
-export default socket;
+};
