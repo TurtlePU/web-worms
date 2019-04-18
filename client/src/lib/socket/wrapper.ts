@@ -6,8 +6,7 @@ const field = {
     initialized: false
 };
 
-var socket: SocketIOClient.Socket;
-export default socket;
+export var socket: SocketIOClient.Socket;
 
 export function initSocket() {
     if (!field.initialized) {
