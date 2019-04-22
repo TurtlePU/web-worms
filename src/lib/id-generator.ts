@@ -27,12 +27,22 @@ function toString(num: number) {
     return ans.substr(1);
 }
 
+/**
+ * Initializes readable-ID generator.
+ * @param words - digits of IDs
+ * @param length - length of returned IDs in words
+ */
 export function initIdGenerator(words: string[], length: number) {
     digits = words;
     const N = pow(digits.length, length);
     id = ShuffledGenerator(N);
 };
 
+/**
+ * ID generation.
+ * @throws RangeError if too many requests
+ * @returns string next ID
+ */
 export default function() {
     let nxt = id.next();
     if (nxt.done) {
