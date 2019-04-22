@@ -30,10 +30,9 @@ socket.emit('channel:query:req');
 
 Каналы:
 
-1. ```join```
-    * ```getLobby()``` &mdash; возвращает ID лобби, к которому можно подключиться.
-    * ```checkLobby(ID: string)``` &mdash; можно ли подключиться к лобби с идентификатором ID?
-    * ```checkRoom(roomID: string, socketID: string)``` &mdash; можно ли подключиться к комнате ```roomID```, если старый сокет был ```socketID```?
+1. ```lobby```
+    * ```get()``` &mdash; возвращает ID лобби, к которому можно подключиться.
+    * ```check(ID: string)``` &mdash; можно ли подключиться к лобби с идентификатором ID?
 
 ### Broadcast-события
 
@@ -53,7 +52,4 @@ socket.to('first-room').emit('channel:event:send', 'Hello world');
 
 Каналы:
 
-1. ```lobby```
-    * ```joined()``` &mdash; сокет подключился к лобби.
-    * ```switched()``` &mdash; игрок готов/не готов (состояние меняется на противоположное) к игре.
-    * ```left()``` &mdash; сокет отключился от лобби.
+TBD

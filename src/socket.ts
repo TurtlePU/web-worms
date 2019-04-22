@@ -6,15 +6,9 @@ import Room  from './lib/room';
 import RequestChannel from './lib/socket-util/request-channel';
 import BroadcastChannel from './lib/socket-util/broadcast-channel';
 
-const joinRequests = new RequestChannel('join')
-    .on('getLobby', Lobby.ID)
-    .on('checkLobby', Lobby.has)
-    .on('checkRoom', (roomID: string, socketID: string) => {
-        return Room.has(roomID) && Room.get(roomID).had(socketID);
-    });
-
-const lobbyBroadcast = new BroadcastChannel('lobby')
-    .open('joined', 'switched', 'left');
+const joinRequests = new RequestChannel('lobby')
+    .on('get', Lobby.ID)
+    .on('check', Lobby.has);
 
 /**
  * Adds event listeners to the given socket.
@@ -24,7 +18,6 @@ export default function(socket: socket.Socket) {
     console.log('new socket connected');
 
     joinRequests.plug(socket);
-    lobbyBroadcast.plug(socket);
 
     socket.on('disconnect', () => {
         console.log('socket disconnected');
