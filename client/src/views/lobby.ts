@@ -55,16 +55,15 @@ export default class LobbyView extends View {
             Router.navigate('join');
         }
 
-        socket.channel('lobby');
-        if (!await socket.request('check', lobbyID)) {
+        if (!await socket.request('lobby:check', lobbyID)) {
             return fail(`Such lobby doesn't exist: ${lobbyID}`);
         }
-        if (!await socket.request('join', lobbyID)) {
+        if (!await socket.request('lobby:join', lobbyID)) {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
         this.members = <HTMLOListElement> $('mems');
-        for (let socketID of await socket.request('members', lobbyID)) {
+        for (let socketID of await socket.request('lobby:members', lobbyID)) {
             console.log(`Socket ID: ${socketID}`);
             this.insertNode(socketID);
         }

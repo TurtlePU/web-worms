@@ -20,14 +20,14 @@ export default class JoinView extends View {
     }
 
     private async joinRandom() {
-        let id = await socket.channel('lobby').request('get');
+        let id = await socket.request('lobby:get');
         Router.navigate(`lobby/${id}`);
     }
 
     private async joinConcrete() {
         let lobby = this.input.value.replace(/\s/g, '');
         if (lobby !== '') {
-            let exists = await socket.channel('lobby').request('check', lobby);
+            let exists = await socket.request('lobby:check', lobby);
             if (exists) {
                 Router.navigate(`lobby/${lobby}`);
             } else {

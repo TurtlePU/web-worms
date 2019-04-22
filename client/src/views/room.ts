@@ -19,12 +19,11 @@ export default class RoomView extends View {
     async load(path: string, roomID: string) {
         super.load(path);
 
-        socket.channel('room');
-        if (!await socket.request('check', roomID, Cookies.get('socket'))) {
+        if (!await socket.request('room:check', roomID, Cookies.get('socket'))) {
             return fail(`Room ${roomID} is inaccessible from old socket`);
         }
         // TODO: join room on server
-        if (!await socket.request('join', roomID, Cookies.get('socket'))) {
+        if (!await socket.request('room:join', roomID, Cookies.get('socket'))) {
             return fail(`Room ${roomID} is full`);
         }
     }
