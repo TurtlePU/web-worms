@@ -4,7 +4,7 @@ import os      from 'os';
 import path    from 'path';
 import socket  from 'socket.io';
 
-import listen  from './listener';
+import listen  from './socket';
 
 import { initIdGenerator } from './lib/id-generator';
 import digits from './data/id-digits.json';
