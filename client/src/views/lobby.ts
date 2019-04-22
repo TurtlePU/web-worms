@@ -20,19 +20,27 @@ function fail(message: string) {
 
 export default class LobbyView extends View {
     private members: HTMLOListElement;
+    private memlist: Set<string>;
 
     constructor() {
         super('lobby', html);
+
+        this.memlist = new Set();
 
         this.insertNode = this.insertNode.bind(this);
 
         socket.on('lobby:join', this.insertNode);
         socket.on('lobby:left', (socketID: string) => {
+            this.memlist.delete(socketID);
             this.members.removeChild($(`socket-${socketID}`));
         });
     }
 
     private insertNode(id: string) {
+        if (this.memlist.has(id)) {
+            return;
+        }
+        this.memlist.add(id);
         this.members.insertAdjacentHTML(
             'beforeend', socketNode(id)
         );
@@ -57,6 +65,7 @@ export default class LobbyView extends View {
 
         this.members = <HTMLOListElement> $('mems');
         for (let socketID of await socket.request('members', lobbyID)) {
+            console.log(`Socket ID: ${socketID}`);
             this.insertNode(socketID);
         }
     }
