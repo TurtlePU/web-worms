@@ -16,7 +16,14 @@ export default class LobbyView extends View {
         super('lobby', html);
     }
 
-    load(path: string, lobbyID: string) {
+    async load(path: string, lobbyID: string) {
+        let exists = await socket.channel('lobby')
+            .request('check', lobbyID);
+        if (!exists) {
+            alert(`Such lobby doesn't exist: ${lobbyID}`);
+            Router.navigate('join');
+        }
+
         super.load(path);
         this.lobbyID = lobbyID;
 
