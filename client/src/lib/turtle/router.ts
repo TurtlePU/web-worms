@@ -9,6 +9,7 @@ type RouterEntry = {
 
 /** Interface of a Router. */
 interface Router {
+    root(root: string): this,
     /**
      * Adds new route to be controlled by Router.
      * 
@@ -61,13 +62,13 @@ interface Router {
      * @param route
      * @returns Router
      */
-    navigate(route: string, forceCheck?: boolean): this
+    navigate(route?: string): this
 }
 
 /** Private fields of a Router. */
 const helper = {
     routes: [] as RouterEntry[],
-    root: '/',
+    root: '',
 
     clearSlashes(path: string) {
         return path.replace(/\/$/, '').replace(/^\//, '');
@@ -101,6 +102,11 @@ const helper = {
 
 /** Singleton Router object for Single-Page Apps. */
 const Router = {
+    root(root: string) {
+        helper.root = root;
+        return Router;
+    },
+
     add(matcher: string | RegExp, handler: Function) {
         console.log(`Router.add <= '${matcher}'`);
         matcher = helper.toRegExp(matcher);
@@ -143,7 +149,7 @@ const Router = {
         });
         if (!res) {
             console.log(`Router.check => none`);
-            Router.navigate(Cookies.get('view'));
+            Router.navigate(helper.root);
         }
         return Router;
     },
@@ -167,10 +173,11 @@ const Router = {
         return Router;
     },
 
-    navigate(route: string, forceCheck?: boolean) {
-        console.log(`Router.navigate <= '${route}'`);
-        window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + route;
-        if (forceCheck) {
+    navigate(route?: string) {
+        if (route) {
+            console.log(`Router.navigate <= '${route}'`);
+            window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + route;
+        } else {
             Router.check();
         }
         return Router;
