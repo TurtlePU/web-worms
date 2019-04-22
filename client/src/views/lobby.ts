@@ -14,8 +14,8 @@ function socketNode(id: string) {
 }
 
 function fail(message: string) {
-    alert(message);
     Router.navigate('join');
+    alert(message);
 }
 
 export default class LobbyView extends View {
@@ -24,8 +24,6 @@ export default class LobbyView extends View {
 
     constructor() {
         super('lobby', html);
-
-        this.memlist = new Set();
 
         this.insertNode = this.insertNode.bind(this);
 
@@ -62,9 +60,9 @@ export default class LobbyView extends View {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
+        this.memlist = new Set();
         this.members = <HTMLOListElement> $('mems');
         for (let socketID of await socket.request('lobby:members', lobbyID)) {
-            console.log(`Socket ID: ${socketID}`);
             this.insertNode(socketID);
         }
     }

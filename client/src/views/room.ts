@@ -7,8 +7,8 @@ const html = /* html */`
 `;
 
 function fail(message: string) {
-    alert(message);
     Router.navigate('join');
+    alert(message);
 }
 
 export default class RoomView extends View {
