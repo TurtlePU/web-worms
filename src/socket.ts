@@ -4,11 +4,18 @@ import Lobby from './lib/lobby';
 import Room  from './lib/room';
 
 import RequestChannel from './lib/socket-util/request-channel';
-import BroadcastChannel from './lib/socket-util/broadcast-channel';
 
 const lobbyRequests = new RequestChannel('lobby')
     .on('get', Lobby.ID)
-    .on('check', Lobby.has);
+    .on('check', (lobbyID: string) => {
+        return !Lobby.get(lobbyID).full();
+    })
+    .on('join', (lobbyID: string, socket: socket.Socket) => {
+        return Lobby.get(lobbyID).push(socket)
+    })
+    .on('members', (lobbyID) => {
+        return Lobby.get(lobbyID).members()
+    });
 
 const roomRequests = new RequestChannel('room')
     .on('check', (roomID: string, socketID: string) => {

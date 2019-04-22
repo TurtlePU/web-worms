@@ -9,9 +9,9 @@ const html = /* html */`
     <ol id='mems'></ol>
 `;
 
-function listNode(text: string) {
-    return /*html*/`<li>${text}</li>`
-};
+function socketNode(id: string) {
+    return /*html*/`<li id='socket-${id}'>${id}</li>`
+}
 
 function fail(message: string) {
     alert(message);
@@ -19,20 +19,33 @@ function fail(message: string) {
 }
 
 export default class LobbyView extends View {
-    private lobbyID: string;
-    private members: HTMLUListElement;
+    private members: HTMLOListElement;
 
     constructor() {
         super('lobby', html);
-        // TODO: lobby change events
+
+        this.insertNode = this.insertNode.bind(this);
+
+        socket.on('lobby:join', this.insertNode);
+        socket.on('lobby:left', (socketID: string) => {
+            this.members.removeChild($(`socket-${socketID}`));
+        });
+    }
+
+    private insertNode(id: string) {
+        this.members.insertAdjacentHTML(
+            'beforeend', socketNode(id)
+        );
     }
 
     async load(path: string, lobbyID: string) {
         super.load(path);
-        this.lobbyID = lobbyID;
 
         let back = <HTMLButtonElement> $('back');
-        back.onclick = () => Router.navigate('join');
+        back.onclick = () => {
+            socket.emit('lobby:left');
+            Router.navigate('join');
+        }
 
         socket.channel('lobby');
         if (!await socket.request('check', lobbyID)) {
@@ -42,9 +55,9 @@ export default class LobbyView extends View {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
-        this.members = <HTMLUListElement> $('mems');
-        for (let mem of await socket.request('members', lobbyID)) {
-            this.members.insertAdjacentHTML('beforeend', listNode(mem));
+        this.members = <HTMLOListElement> $('mems');
+        for (let socketID of await socket.request('members', lobbyID)) {
+            this.insertNode(socketID);
         }
     }
 }

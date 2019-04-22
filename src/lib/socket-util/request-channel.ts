@@ -22,7 +22,7 @@ export default class RequestChannel {
     /**
      * Adds a request listener on the channel.
      * @param name - name of the request
-     * @param handler - request listener
+     * @param handler - request listener. Can accept socket as a last argument
      * @returns @this
      */
     on(name: string, handler: (...args: any[]) => any) {
@@ -36,8 +36,8 @@ export default class RequestChannel {
      */
     plug(socket: Socket) {
         for (let { name, handler } of this.requests) {
-            socket.on(`${this.channel}:${name}:req`, (...args) => {
-                socket.emit(`${this.channel}:${name}:res`, handler(...args));
+            socket.on(`${this.channel}:${name}:req`, async (...args) => {
+                socket.emit(`${this.channel}:${name}:res`, await handler(...args, socket));
             });
         }
     }

@@ -14,22 +14,24 @@ export default class JoinView extends View {
 
     constructor() {
         super('join', html);
-        this.joinLobby.bind(this);
+
+        this.joinRandom = this.joinRandom.bind(this);
+        this.joinConcrete = this.joinConcrete.bind(this);
     }
 
-    private async joinLobby(rnd?: boolean) {
-        if (rnd) {
-            let id = await socket.channel('lobby').request('get');
-            Router.navigate(`lobby/${id}`);
-        } else {
-            let lobby = this.input.value.replace(/\s/g, '');
-            if (lobby !== '') {
-                let exists = await socket.channel('lobby').request('check', lobby);
-                if (exists) {
-                    Router.navigate(`lobby/${lobby}`);
-                } else {
-                    Router.navigate(`room/${lobby}`);
-                }
+    private async joinRandom() {
+        let id = await socket.channel('lobby').request('get');
+        Router.navigate(`lobby/${id}`);
+    }
+
+    private async joinConcrete() {
+        let lobby = this.input.value.replace(/\s/g, '');
+        if (lobby !== '') {
+            let exists = await socket.channel('lobby').request('check', lobby);
+            if (exists) {
+                Router.navigate(`lobby/${lobby}`);
+            } else {
+                Router.navigate(`room/${lobby}`);
             }
         }
     }
@@ -40,14 +42,14 @@ export default class JoinView extends View {
         this.input = <HTMLInputElement> $('lobby-id');
         this.input.onkeypress = async event => {
             if (event.key === 'Enter') {
-                await this.joinLobby();
+                await this.joinConcrete();
             }
         };
 
         let goButton = <HTMLButtonElement> $('go');
-        goButton.onclick = async () => await this.joinLobby();
+        goButton.onclick = this.joinConcrete;
 
         let rdButton = <HTMLButtonElement> $('random');
-        rdButton.onclick = async () => await this.joinLobby(true);
+        rdButton.onclick = this.joinRandom;
     }
 }

@@ -2,9 +2,16 @@ import { Socket } from 'socket.io';
 
 import idGenerator from './id-generator';
 
+class NullLobby {
+    full() { return true; }
+    push(_: any) { return false; }
+    members() { return [] as string[]; }
+}
+const nullLobby = new NullLobby();
+
 /** Game lobby class. */
 export default class Lobby {
-/** STATIC */
+// STATIC
     /** Available lobbies. */
     private static pool = new Map<string, Lobby>();
 
@@ -18,7 +25,7 @@ export default class Lobby {
      * @returns ID of a joinable lobby (if there are none, creates new)
      */
     static ID() {
-        if (Lobby.pool.size === 0) {
+        if (Lobby.pool.size == 0) {
             let lobby = new Lobby();
             Lobby.pool.set(lobby.ID, lobby);
         }
@@ -27,13 +34,13 @@ export default class Lobby {
 
     /**
      * @param ID - ID of some lobby
-     * @returns true if given lobby is joinable, false otherwise
+     * @returns Lobby if it is joinable 
      */
-    static has(ID: string) {
-        return Lobby.pool.has(ID);
+    static get(ID: string) {
+        return Lobby.pool.get(ID) || Lobby.full.get(ID) || nullLobby;
     }
 
-/** OBJECT */
+// OBJECT
     /** Unique short identifier. */
     private readonly ID: string;
 
@@ -54,20 +61,41 @@ export default class Lobby {
      * @param socket
      * @returns true if socket was pushed, false if lobby is full
      */
-    private push(socket: Socket) {
+    push(socket: Socket) {
         if (this.full()) {
             return false;
         } else {
             this.sockets.push(socket);
+
+            socket.join(this.ID);
+            socket.on('lobby:left', () => {
+                this.remove(socket);
+                socket.to(this.ID).emit('lobby:left', socket.id);
+            })
+            socket.on('disconnect', () => {
+                this.remove(socket);
+                socket.to(this.ID).emit('lobby:left', socket.id);
+            });
+            socket.to(this.ID).emit('lobby:join', socket.id);
+
+            if (this.full()) {
+                Lobby.pool.delete(this.ID);
+                Lobby.full.set(this.ID, this);
+            }
+
             return true;
         }
+    }
+
+    members() {
+        return this.sockets.map(socket => socket.id);
     }
 
     /**
      * @returns true if lobby is full, false otherwise
      */
-    private full() {
-        return this.sockets.length === Lobby.CAPACITY;
+    full() {
+        return this.sockets.length == Lobby.CAPACITY;
     }
 
     /**
@@ -75,12 +103,19 @@ export default class Lobby {
      * @param socket
      * @returns true if socket was removed, false if not found
      */
-    private remove(socket: Socket) {
+    remove(socket: Socket) {
         let index = this.sockets.findIndex(element => {
             return element.id == socket.id;
         });
         if (index != -1) {
             this.sockets.splice(index, 1);
+
+            socket.leave(this.ID);
+            // TODO: Lobby.remove
+            // socket.removeListener();
+
+            Lobby.full.delete(this.ID);
+            Lobby.pool.set(this.ID, this);
         }
         return index != -1;
     }
