@@ -1,5 +1,10 @@
 import { Socket } from 'socket.io';
 
+class NullRoom {
+    had(socketID: string) { return false; }
+}
+const nullRoom = new NullRoom();
+
 /** Game room class. */
 export default class Room {
 /** STATIC */
@@ -8,18 +13,10 @@ export default class Room {
 
     /**
      * @param ID - ID of some room
-     * @returns true if given room is live, false otherwise 
-     */
-    static has(ID: string) {
-        return Room.pool.has(ID);
-    }
-
-    /**
-     * @param ID - ID of some room
      * @returns Room by given ID
      */
     static get(ID: string) {
-        return Room.pool.get(ID);
+        return Room.pool.get(ID) || nullRoom;
     }
 
 /** OBJECT */
