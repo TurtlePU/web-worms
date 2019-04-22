@@ -1,10 +1,10 @@
 import socket from 'socket.io';
 
-import Lobby from './lobby';
-import Room  from './room';
+import Lobby from './lib/lobby';
+import Room  from './lib/room';
 
-import RequestChannel from './request-channel';
-import BroadcastChannel from './broadcast-channel';
+import RequestChannel from './lib/request-channel';
+import BroadcastChannel from './lib/broadcast-channel';
 
 const joinRequests = new RequestChannel('join')
     .on('getLobby', Lobby.ID)
