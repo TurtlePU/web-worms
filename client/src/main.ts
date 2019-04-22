@@ -7,14 +7,16 @@ import RoomView  from './views/room.js';
 
 window.onload = async () => {
     console.log(`Saved page: '${Cookies.get('view')}'`);
+
     initSocket();
+
     const joinView  = new JoinView();
     const lobbyView = new LobbyView();
     const roomView  = new RoomView();
-    Router
+
+    Router.root(joinView.ID)
         .add(joinView.ID,   joinView.load)
         .add(/lobby\/(.+)/, lobbyView.load)
         .add(/room\/(.+)/,  roomView.load)
-        .listen()
-        .navigate(Cookies.get('view') || joinView.ID, true);
+        .listen().navigate();
 };
