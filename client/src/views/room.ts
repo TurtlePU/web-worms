@@ -15,14 +15,15 @@ export default class RoomView extends View {
     }
 
     async load(path: string, roomID: string) {
-        let exists = await socket.channel('room')
+        super.load(path);
+        this.roomID = roomID;
+
+        let exists = await socket
+            .channel('room')
             .request('check', roomID, Cookies.get('socket'));
         if (!exists) {
             alert(`Such lobby doesn't exist: ${roomID}`);
             Router.navigate('join');
         }
-
-        super.load(path);
-        this.roomID = roomID;
     }
 }
