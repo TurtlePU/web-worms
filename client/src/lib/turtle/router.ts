@@ -2,6 +2,8 @@
 // Made by Turtle, P.U. in 2019
 // Based on http://krasimirtsonev.com/blog/article/A-modern-JavaScript-router-in-100-lines-history-api-pushState-hash-url
 
+// TODO: classic Singleton. Tired of one object split in 3 parts.
+
 type RouterEntry = {
     matcher: RegExp,
     handler: Function
@@ -9,10 +11,15 @@ type RouterEntry = {
 
 /** Interface of a Router. */
 interface Router {
+    /**
+     * Sets redirection for failed checks (aka start page).
+     * @param root - redirection path
+     * @returns Router
+     */
     root(root: string): this,
+
     /**
      * Adds new route to be controlled by Router.
-     * 
      * @param matcher - route or RegEx for a series of routes
      * @param handler - function called when route is navigated. Must accept (path, ...captures of matcher)
      * @returns Router
@@ -21,7 +28,6 @@ interface Router {
 
     /**
      * Removes a given route.
-     * 
      * @param matcher - route or RegEx for a series of routes
      * @returns Router
      */
@@ -29,43 +35,39 @@ interface Router {
 
     /**
      * Removes all routes.
-     * 
      * @returns Router
      */
     flush(): this,
 
     /**
      * Sets listener of address bar. Essential to work.
-     * 
      * @returns Router
      */
     listen(): this,
     
     /**
      * Stops listening bar change.
-     * 
      * @returns Router
      */
     unlisten(): this,
 
     /**
-     * Searches for the given route and sets its view if found. Otherwise navigates to the last saved view.
-     * 
+     * Searches for the given route (or one in the address bar) and sets its view if found.
+     * Otherwise navigates to the main page.
      * @param route
      * @returns Router
      */
     check(route?: string): this,
 
     /**
-     * Changes the address bar. Router.check() is called automatically if Router listens.
-     * 
+     * Changes the address bar. If not given, makes force check().
+     * If given, check() is called automatically if Router listens.
      * @param route
      * @returns Router
      */
     navigate(route?: string): this
 }
 
-/** Private fields of a Router. */
 const helper = {
     routes: [] as RouterEntry[],
     root: '',

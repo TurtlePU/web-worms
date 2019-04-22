@@ -1,12 +1,9 @@
 ///<reference path='pixi.js.d.ts'/>
 
-/**
- * Small Loader wrapper to load with Promises.
- */
+/** Small Loader wrapper to load with Promises. */
 export default class Loader extends PIXI.loaders.Loader {
     /**
      * Loads given assets, promisified.
-     * 
      * @returns loading Promise
      */
     async loadAsync(): Promise<this> {

@@ -3,6 +3,8 @@ import { socket } from '../lib/socket/wrapper.js';
 import { $, View } from '../lib/turtle/main.js';
 import Router from '../lib/turtle/router.js';
 
+// TODO: ready/not ready logic, start game (for any? player)
+
 const html = /* html */`
     <h1>Lobby</h1>
     <button id='back'>Back</button>

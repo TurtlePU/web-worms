@@ -41,7 +41,7 @@ export function initIdGenerator(words: string[], length: number) {
 /**
  * ID generation.
  * @throws RangeError if too many requests
- * @returns string next ID
+ * @returns next ID
  */
 export default function() {
     let nxt = id.next();

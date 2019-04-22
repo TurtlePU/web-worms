@@ -3,6 +3,8 @@ import Router from '../lib/turtle/router.js';
 
 import { socket } from '../lib/socket/wrapper.js';
 
+// TODO: reconnect button
+
 const html = /* html */`
     <h1>Worms II</h1>
     <input type='text' id='lobby-id' placeholder='Lobby/Room ID'>
