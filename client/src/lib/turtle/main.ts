@@ -32,9 +32,9 @@ export class View {
      * Sets this View on screen. Good practice is to use it as a handler for {@link router.ts#Router}.
      * 
      * @param path - path from which this View is loaded
-     * @param args - any load properties defined in subclasses
+     * @param _args - any load properties defined in subclasses
      */
-    load(path: string, ...args: any) {
+    load(path: string, ..._args: any) {
         console.log(`View.load <= '${path}'`);
         console.log(`HTML view <= '${this.ID}'`);
         setView(this.HTML);
