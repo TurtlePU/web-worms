@@ -24,7 +24,9 @@ const interfaces = os.networkInterfaces();
 httpServer.listen(PORT, () => {
     Object.values(interfaces).forEach(ifaceInfo => {
         ifaceInfo.forEach(iface => {
-            console.log(`Listening on ${iface.address}:${PORT}`);
+            if (!iface.internal && iface.family == 'IPv4') {
+                console.log(`Listening on ${iface.address}:${PORT}`);
+            }
         });
     });
 });
