@@ -3,8 +3,8 @@ import socket from 'socket.io';
 import Lobby from './lib/lobby';
 import Room  from './lib/room';
 
-import RequestChannel from './lib/request-channel';
-import BroadcastChannel from './lib/broadcast-channel';
+import RequestChannel from './lib/socket-util/request-channel';
+import BroadcastChannel from './lib/socket-util/broadcast-channel';
 
 const joinRequests = new RequestChannel('join')
     .on('getLobby', Lobby.ID)
