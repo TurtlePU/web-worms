@@ -1,40 +1,42 @@
 const { floor, pow, random } = Math;
 
-const helper = {
-    digits: [] as string[],
-    length: 0,
-    order: [] as number[],
-    index: 0,
-    shuffle<T>(array: T[]) {
-        let i = array.length, t, j;
-        while (i != 0) {
-            j = floor(random() * i);
-            --i;
-
-            t = array[i];
-            array[i] = array[j];
-            array[j] = t;
-        }
-        return array;
-    },
-    build(from: number) {
-        let ans = '';
-        while (from != 0) {
-            ans += `-${helper.digits[from % helper.digits.length]}`;
-            from = floor(from / helper.digits.length);
-        }
-        return ans.substr(1);
+let id: IterableIterator<number>;
+function* ShuffledGenerator(N: number) {
+    let index = 0;
+    let order = shuffle([...new Array(N).keys()]);
+    while (index < order.length) {
+        yield order[index++];
     }
-};
+}
 
-export function initIdGenerator(digits: string[], length: number) {
-    helper.digits = digits;
-    helper.length = length;
+function shuffle(array: any[]) {
+    for (let i = array.length - 1; i != 0; --i) {
+        let j = floor(random() * (i + 1));
+        [ array[i], array[j] ] = [ array[j], array[i] ];
+    }
+    return array;
+}
 
-    const N = pow(helper.digits.length, length);
-    helper.order = helper.shuffle([...new Array(N).keys()]);
+let digits = [] as string[];
+function toString(num: number) {
+    let ans = '', n = digits.length;
+    while (num != 0) {
+        ans += `-${digits[num % n]}`;
+        num = floor(num / n);
+    }
+    return ans.substr(1);
+}
+
+export function initIdGenerator(words: string[], length: number) {
+    digits = words;
+    const N = pow(digits.length, length);
+    id = ShuffledGenerator(N);
 };
 
 export default function() {
-    return helper.build(helper.order[helper.index++]);
+    let nxt = id.next();
+    if (nxt.done) {
+        throw new RangeError('All IDs are used');
+    }
+    return toString(nxt.value);
 };
