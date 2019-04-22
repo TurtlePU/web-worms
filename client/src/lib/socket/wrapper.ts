@@ -20,19 +20,17 @@ export function initSocket() {
         };
 
         socket.request = async (request: string, ...args: any[]) => {
-            let fullname = `${field.channel}:${request}`;
-            console.log(`socket.request <= ${fullname}`);
             return new Promise((resolve, reject) => {
-                let timeout: number;
-                socket.once(`${fullname}:res`, (...args: any) => {
+                let fullname = `${field.channel}:${request}`;
+                console.log(`socket.request <= ${fullname}`);
+                let timeout = window.setTimeout(() => {
+                    reject(`${fullname}: Connection timed out`);
+                }, 10 * 1000);
+                socket.emit(fullname, ...args, (...args: any[]) => {
                     window.clearTimeout(timeout);
                     console.log(`socket.request =>`, ...args);
                     resolve(...args);
                 });
-                socket.emit(`${fullname}:req`, ...args);
-                timeout = window.setTimeout(() => {
-                    reject(`${fullname}: Connection timed out`);
-                }, 10 * 1000);
             });
         };
 
