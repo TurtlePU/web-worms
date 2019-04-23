@@ -8,11 +8,16 @@ import Router from '../lib/turtle/router.js';
 const html = /* html */`
     <h1>Lobby</h1>
     <button id='back'>Back</button>
+    <input type='checkbox' id='ready'>
     <ol id='mems'></ol>
 `;
 
+function socketText(id: string, ready?: boolean) {
+    return `${id} ${ready ? '✔️' : '❌'}`;
+}
+
 function socketNode(id: string) {
-    return /*html*/`<li id='socket-${id}'>${id}</li>`
+    return /*html*/`<li id='socket-${id}'>${socketText(id)}</li>`;
 }
 
 function fail(message: string) {
@@ -30,6 +35,10 @@ export default class LobbyView extends View {
         this.insertNode = this.insertNode.bind(this);
 
         socket.on('lobby:join', this.insertNode);
+        socket.on('lobby:ready', (socketID: string, ready: boolean) => {
+            (<HTMLLIElement> $(`socket-${socketID}`))
+                .innerText = socketText(socketID, ready);
+        });
         socket.on('lobby:left', (socketID: string) => {
             this.memlist.delete(socketID);
             this.members.removeChild($(`socket-${socketID}`));
@@ -53,6 +62,11 @@ export default class LobbyView extends View {
         back.onclick = () => {
             socket.emit('lobby:left');
             Router.navigate('join');
+        }
+
+        let ready = <HTMLInputElement> $('ready');
+        ready.onclick = () => {
+            socket.emit('lobby:ready');
         }
 
         if (!await socket.request('lobby:check', lobbyID)) {

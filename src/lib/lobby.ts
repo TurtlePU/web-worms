@@ -9,6 +9,16 @@ class NullLobby {
 }
 const nullLobby = new NullLobby();
 
+interface LobbySocket extends Socket {
+    ready: boolean
+}
+
+function toLobbySocket(socket: Socket) {
+    let newSocket = socket as LobbySocket;
+    newSocket.ready = false;
+    return newSocket;
+}
+
 /** Game lobby class. */
 export default class Lobby {
 // STATIC
@@ -45,7 +55,7 @@ export default class Lobby {
     private readonly ID: string;
 
     /** Sockets connected to the lobby. */
-    private sockets: Socket[];
+    private sockets: LobbySocket[];
 
     /**
      * @constructor
@@ -61,22 +71,28 @@ export default class Lobby {
      * @param socket
      * @returns true if socket was pushed, false if lobby is full
      */
-    push(socket: Socket) {
+    push(_socket: Socket) {
         if (this.full()) {
             return false;
         } else {
+            let socket = toLobbySocket(_socket);
             this.sockets.push(socket);
 
-            socket.join(this.ID);
-            socket.on('lobby:left', () => {
+            socket.join(this.ID)
+            .on('lobby:left', () => {
                 this.remove(socket);
-                socket.to(this.ID).emit('lobby:left', socket.id);
+                socket.server.to(this.ID).emit('lobby:left', socket.id);
             })
-            socket.on('disconnect', () => {
+            .on('lobby:ready', () => {
+                socket.ready = !socket.ready;
+                console.log(`Socket ${socket.id} ready? ${socket.ready}`);
+                socket.server.to(this.ID).emit('lobby:ready', socket.id, socket.ready);
+            })
+            .on('disconnect', () => {
                 this.remove(socket);
-                socket.to(this.ID).emit('lobby:left', socket.id);
-            });
-            socket.to(this.ID).emit('lobby:join', socket.id);
+                socket.server.to(this.ID).emit('lobby:left', socket.id);
+            })
+            .server.to(this.ID).emit('lobby:join', socket.id);
 
             if (this.full()) {
                 Lobby.pool.delete(this.ID);
