@@ -3,21 +3,25 @@ import { socket } from '../lib/socket/wrapper.js';
 import { $, View } from '../lib/turtle/main.js';
 import Router from '../lib/turtle/router.js';
 
-// TODO: ready/not ready logic, start game (for any? player)
+// TODO: start game (for any? player)
 
 const html = /* html */`
     <h1>Lobby</h1>
     <button id='back'>Back</button>
     <input type='checkbox' id='ready'>
-    <ol id='mems'></ol>
+    <table><tbody id='mems'></tbody></table>
 `;
 
-function socketText(id: string, ready?: boolean) {
-    return `${id} ${ready ? '✔️' : '❌'}`;
+function socketText(id: string, ready: boolean) {
+    return /*html*/`
+        <td>${id}</td><td>${ready ? '✔️' : '❌'}</td>
+    `;
 }
 
-function socketNode(id: string) {
-    return /*html*/`<li id='socket-${id}'>${socketText(id)}</li>`;
+function socketNode(id: string, ready: boolean) {
+    return /*html*/`
+        <tr id='socket-${id}'>${socketText(id, ready)}</tr>
+    `;
 }
 
 function fail(message: string) {
@@ -26,33 +30,26 @@ function fail(message: string) {
 }
 
 export default class LobbyView extends View {
-    private members: HTMLOListElement;
-    private memlist: Set<string>;
-
     constructor() {
         super('lobby', html);
 
-        this.insertNode = this.insertNode.bind(this);
-
-        socket.on('lobby:join', this.insertNode);
-        socket.on('lobby:ready', (socketID: string, ready: boolean) => {
-            (<HTMLLIElement> $(`socket-${socketID}`))
-                .innerText = socketText(socketID, ready);
-        });
-        socket.on('lobby:left', (socketID: string) => {
-            this.memlist.delete(socketID);
-            this.members.removeChild($(`socket-${socketID}`));
+        socket
+        .on('lobby:join', (socketID: string) => {
+            this.insertNode(socketID, false);
+        })
+        .on('lobby:ready', (socketID: string, ready: boolean) => {
+            $(`socket-${socketID}`).innerHTML = socketText(socketID, ready);
+        })
+        .on('lobby:left', (socketID: string) => {
+            $(`mems`).removeChild($(`socket-${socketID}`));
         });
     }
 
-    private insertNode(id: string) {
-        if (this.memlist.has(id)) {
+    private insertNode(id: string, ready: boolean) {
+        if ($(`socket-${id}`)) {
             return;
         }
-        this.memlist.add(id);
-        this.members.insertAdjacentHTML(
-            'beforeend', socketNode(id)
-        );
+        $('mems').innerHTML += socketNode(id, ready);
     }
 
     async load(path: string, lobbyID: string) {
@@ -76,10 +73,8 @@ export default class LobbyView extends View {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
-        this.memlist = new Set();
-        this.members = <HTMLOListElement> $('mems');
-        for (let socketID of await socket.request('lobby:members', lobbyID)) {
-            this.insertNode(socketID);
+        for (let { id, ready } of await socket.request('lobby:members', lobbyID)) {
+            this.insertNode(id, ready);
         }
     }
 }

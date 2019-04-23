@@ -104,7 +104,9 @@ export default class Lobby {
     }
 
     members() {
-        return this.sockets.map(socket => socket.id);
+        return this.sockets.map(socket => {
+            return { id: socket.id, ready: socket.ready };
+        });
     }
 
     /**
