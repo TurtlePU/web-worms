@@ -2,21 +2,24 @@ import { Socket } from 'socket.io';
 
 import idGenerator from './id-generator';
 
-class NullLobby {
-    full() { return true; }
-    push(_: any) { return false; }
-    members() { return [] as string[]; }
-}
-const nullLobby = new NullLobby();
+const nullLobby = {
+    full: () => true,
+    push: (_: any) => false,
+    members: () => [] as string[]
+};
 
-interface LobbySocket extends Socket {
-    ready: boolean
+class Listener {
+    event: string;
+    handler: (...args: any[]) => void;
+    constructor(event: string, handler: (...args: any[]) => void) {
+        this.event = event;
+        this.handler = handler;
+    }
 }
 
-function toLobbySocket(socket: Socket) {
-    let newSocket = socket as LobbySocket;
-    newSocket.ready = false;
-    return newSocket;
+interface SocketInfo {
+    ready: boolean,
+    listeners: Listener[]
 }
 
 /** Game lobby class. */
@@ -55,7 +58,8 @@ export default class Lobby {
     private readonly ID: string;
 
     /** Sockets connected to the lobby. */
-    private sockets: LobbySocket[];
+    private sockets: Socket[];
+    private socketInfo: Map<string, SocketInfo>;
 
     /**
      * @constructor
@@ -64,6 +68,7 @@ export default class Lobby {
     private constructor() {
         this.ID = idGenerator();
         this.sockets = [];
+        this.socketInfo = new Map();
     }
 
     /**
@@ -71,28 +76,38 @@ export default class Lobby {
      * @param socket
      * @returns true if socket was pushed, false if lobby is full
      */
-    push(_socket: Socket) {
+    push(socket: Socket) {
         if (this.full()) {
             return false;
         } else {
-            let socket = toLobbySocket(_socket);
             this.sockets.push(socket);
 
-            socket.join(this.ID)
-            .on('lobby:left', () => {
+            const leave = () => {
                 this.remove(socket);
                 socket.server.to(this.ID).emit('lobby:left', socket.id);
-            })
-            .on('lobby:ready', () => {
-                socket.ready = !socket.ready;
-                console.log(`Socket ${socket.id} ready? ${socket.ready}`);
-                socket.server.to(this.ID).emit('lobby:ready', socket.id, socket.ready);
-            })
-            .on('disconnect', () => {
-                this.remove(socket);
-                socket.server.to(this.ID).emit('lobby:left', socket.id);
-            })
-            .server.to(this.ID).emit('lobby:join', socket.id);
+            };
+
+            const listeners = [
+                new Listener('lobby:left', leave),
+                new Listener('disconnect', leave),
+                new Listener('lobby:ready', () => {
+                    let info = this.socketInfo.get(socket.id);
+                    info.ready = !info.ready;
+                    console.log(`Socket ${socket.id} ready? ${info.ready}`);
+                    socket.server.to(this.ID).emit('lobby:ready', socket.id, info.ready);
+                })
+            ];
+
+            socket.join(this.ID);
+            for (let { event, handler } of listeners) {
+                socket.on(event, handler);
+            }
+            socket.server.to(this.ID).emit('lobby:join', socket.id);
+
+            this.socketInfo.set(socket.id, {
+                ready: false,
+                listeners
+            });
 
             if (this.full()) {
                 Lobby.pool.delete(this.ID);
@@ -105,7 +120,10 @@ export default class Lobby {
 
     members() {
         return this.sockets.map(socket => {
-            return { id: socket.id, ready: socket.ready };
+            return {
+                id: socket.id,
+                ready: this.socketInfo.get(socket.id).ready
+            };
         });
     }
 
@@ -129,8 +147,9 @@ export default class Lobby {
             this.sockets.splice(index, 1);
 
             socket.leave(this.ID);
-            // TODO: Lobby.remove
-            // socket.removeListener();
+            for (let { event, handler } of this.socketInfo.get(socket.id).listeners) {
+                socket.removeListener(event, handler);
+            }
 
             Lobby.full.delete(this.ID);
             Lobby.pool.set(this.ID, this);
