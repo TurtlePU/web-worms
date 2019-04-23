@@ -71,6 +71,17 @@ export default class Lobby {
         this.socketInfo = new Map();
     }
 
+    private emitEnabled() {
+        if (this.sockets.length == 0) {
+            return;
+        }
+        this.sockets[0].emit(
+            'lobby:start-enabled',
+            [...this.socketInfo.values()]
+                .every(info => info.ready)
+        );
+    }
+
     /**
      * Adds given socket to the lobby list.
      * @param socket
@@ -85,6 +96,7 @@ export default class Lobby {
             const leave = () => {
                 this.remove(socket);
                 socket.server.to(this.ID).emit('lobby:left', socket.id);
+                this.emitEnabled();
             };
 
             const listeners = [
@@ -93,8 +105,16 @@ export default class Lobby {
                 new Listener('lobby:ready', () => {
                     let info = this.socketInfo.get(socket.id);
                     info.ready = !info.ready;
-                    console.log(`Socket ${socket.id} ready? ${info.ready}`);
-                    socket.server.to(this.ID).emit('lobby:ready', socket.id, info.ready);
+                    socket.server.to(this.ID).emit('lobby:ready',
+                        socket.id,
+                        info.ready,
+                        socket.id == this.sockets[0].id
+                    );
+                    this.emitEnabled();
+                }),
+                new Listener('lobby:start', () => {
+                    // TODO: start game
+                    console.log('Start!');
                 })
             ];
 
@@ -102,12 +122,17 @@ export default class Lobby {
             for (let { event, handler } of listeners) {
                 socket.on(event, handler);
             }
-            socket.server.to(this.ID).emit('lobby:join', socket.id);
+            socket.server.to(this.ID).emit('lobby:join',
+                socket.id,
+                false,
+                socket.id == this.sockets[0].id
+            );
 
             this.socketInfo.set(socket.id, {
                 ready: false,
                 listeners
             });
+            this.emitEnabled();
 
             if (this.full()) {
                 Lobby.pool.delete(this.ID);
@@ -119,10 +144,11 @@ export default class Lobby {
     }
 
     members() {
-        return this.sockets.map(socket => {
+        return this.sockets.map((socket, index) => {
             return {
                 id: socket.id,
-                ready: this.socketInfo.get(socket.id).ready
+                ready: this.socketInfo.get(socket.id).ready,
+                first: index == 0
             };
         });
     }
@@ -150,6 +176,8 @@ export default class Lobby {
             for (let { event, handler } of this.socketInfo.get(socket.id).listeners) {
                 socket.removeListener(event, handler);
             }
+
+            this.socketInfo.delete(socket.id);
 
             Lobby.full.delete(this.ID);
             Lobby.pool.set(this.ID, this);

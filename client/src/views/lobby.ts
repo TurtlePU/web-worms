@@ -3,24 +3,19 @@ import { socket } from '../lib/socket/wrapper.js';
 import { $, View } from '../lib/turtle/main.js';
 import Router from '../lib/turtle/router.js';
 
-// TODO: start game (for any? player)
-
 const html = /* html */`
     <h1>Lobby</h1>
     <button id='back'>Back</button>
     <input type='checkbox' id='ready'>
+    <button id='start' disabled='true'>Start</button>
     <table><tbody id='mems'></tbody></table>
 `;
 
-function socketText(id: string, ready: boolean) {
+function socketText(id: string, ready: boolean, first: boolean) {
     return /*html*/`
-        <td>${id}</td><td>${ready ? '✔️' : '❌'}</td>
-    `;
-}
-
-function socketNode(id: string, ready: boolean) {
-    return /*html*/`
-        <tr id='socket-${id}'>${socketText(id, ready)}</tr>
+        <td>${id}</td>
+        <td>${ready ? '✔️' : '❌'}</td>
+        <td>${id == socket.id ? '⬅️' : ''}${first ? '🥇' : ''}</td>
     `;
 }
 
@@ -34,37 +29,44 @@ export default class LobbyView extends View {
         super('lobby', html);
 
         socket
-        .on('lobby:join', (socketID: string) => {
-            this.insertNode(socketID, false);
+        .on('lobby:join', (socketID: string, ready: boolean, first: boolean) => {
+            this.insertNode(socketID, ready, first);
         })
-        .on('lobby:ready', (socketID: string, ready: boolean) => {
-            $(`socket-${socketID}`).innerHTML = socketText(socketID, ready);
+        .on('lobby:ready', (socketID: string, ready: boolean, first: boolean) => {
+            $(`socket-${socketID}`).innerHTML = socketText(socketID, ready, first);
+        })
+        .on('lobby:start-enabled', (enabled: boolean) => {
+            $('start').disabled = !enabled;
         })
         .on('lobby:left', (socketID: string) => {
-            $(`mems`).removeChild($(`socket-${socketID}`));
+            $('mems').removeChild($(`socket-${socketID}`));
         });
     }
 
-    private insertNode(id: string, ready: boolean) {
+    private insertNode(id: string, ready: boolean, first: boolean) {
         if ($(`socket-${id}`)) {
             return;
         }
-        $('mems').innerHTML += socketNode(id, ready);
+        $('mems').innerHTML += /*html*/`
+            <tr id='socket-${id}'>${socketText(id, ready, first)}</tr>
+        `;
     }
 
     async load(path: string, lobbyID: string) {
         super.load(path);
 
-        let back = <HTMLButtonElement> $('back');
-        back.onclick = () => {
+        $('back').onclick = () => {
             socket.emit('lobby:left');
             Router.navigate('join');
-        }
+        };
 
-        let ready = <HTMLInputElement> $('ready');
-        ready.onclick = () => {
+        $('ready').onclick = () => {
             socket.emit('lobby:ready');
-        }
+        };
+
+        $('start').onclick = () => {
+            socket.emit('lobby:start');
+        };
 
         if (!await socket.request('lobby:check', lobbyID)) {
             return fail(`Such lobby doesn't exist: ${lobbyID}`);
@@ -73,8 +75,8 @@ export default class LobbyView extends View {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
-        for (let { id, ready } of await socket.request('lobby:members', lobbyID)) {
-            this.insertNode(id, ready);
+        for (let { id, ready, first } of await socket.request('lobby:members', lobbyID)) {
+            this.insertNode(id, ready, first);
         }
     }
 }
