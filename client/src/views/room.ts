@@ -5,6 +5,10 @@ import Router from '../lib/turtle/router.js';
 
 import { socket } from '../lib/socket/wrapper.js';
 
+import GameRules from '../game/game-rules.js';
+import Graphics  from '../game/graphics.js';
+import Physics   from '../game/physics.js';
+
 const html = /* html */`
 `;
 
@@ -14,6 +18,10 @@ function fail(message: string) {
 }
 
 export default class RoomView extends View {
+    private gameRules: GameRules;
+    private graphics: Graphics;
+    private physics: Physics;
+
     constructor() {
         super('room', html);
 
@@ -21,18 +29,6 @@ export default class RoomView extends View {
         .on('room:start', (roomID: string) => {
             Router.navigate(`room/${roomID}`);
         })
-    }
-
-    initGraphics() {
-        // TODO: init graphics
-    }
-
-    initPhysics(...args: any[]) {
-        // TODO: init physics
-    }
-
-    initGame(...args: any[]) {
-        // TODO: init game constants & rules
     }
 
     async load(path: string, roomID: string) {
@@ -47,8 +43,8 @@ export default class RoomView extends View {
 
         // TODO: init UI
 
-        this.initGraphics();
-        this.initPhysics(await socket.request('room:scheme:physics'));
-        this.initGame(await socket.request('room:scheme:game'));
+        this.gameRules = new GameRules(await socket.request('room:scheme:game'));
+        this.graphics  = new Graphics();
+        this.physics   = new Physics(await socket.request('room:scheme:physics'));
     }
 }
