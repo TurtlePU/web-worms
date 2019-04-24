@@ -32,6 +32,12 @@ export default function(socket: socket.Socket) {
     socket
     .on('room:check', (roomID, socketID, ack) => {
         ack(Room.get(roomID).had(socketID));
+    })
+    .on('room:join', (roomID, socketID, ack) => {
+        ack(
+            Room.get(roomID).had(socketID) &&
+            Room.get(roomID).push(socket)
+        );
     });
 
     socket.on('disconnect', () => {

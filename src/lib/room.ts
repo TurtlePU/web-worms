@@ -1,8 +1,11 @@
 import { Socket } from 'socket.io';
 
+import Listener from './socket-listener';
+
 const nullRoom = {
-    had: (_: string) => false,
+    had: (_: any) => false,
     start: () => {},
+    push: (_: any) => false
 };
 
 /** Game room class. */
@@ -35,11 +38,20 @@ export default class Room {
     private sockets: Socket[];
     /** IDs of Sockets previously connected to the room. */
     private oldSockets: Set<string>;
+    /** Game settings. */
+    private readonly schemes = {
+        physics: {
+            // TODO: physics settings
+        },
+        game: {
+            // TODO: game settings
+        }
+    };
 
     private constructor(ID: string, sockets: Socket[]) {
         this.ID = ID;
         this.sockets = sockets;
-        this.oldSockets = new Set();
+        this.oldSockets = new Set(sockets.map(socket => socket.id));
     }
 
     /**
@@ -47,6 +59,19 @@ export default class Room {
      */
     start() {
         // TODO: Room.start()
+    }
+
+    push(socket: Socket) {
+        // FIXME: Room.push -- unit operation of start() & reconnect
+        const listeners = [
+            new Listener('room:scheme:physics', (ack) => {
+                ack(this.schemes.physics);
+            }),
+            new Listener('room:scheme:game', (ack) => {
+                ack(this.schemes.game);
+            })
+        ];
+        return true;
     }
 
     /**

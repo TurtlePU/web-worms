@@ -1,22 +1,14 @@
+import { EventEmitter } from 'events';
 import { Socket } from 'socket.io';
 
 import idGenerator from './id-generator';
-import { EventEmitter } from 'events';
+import Listener from './socket-listener';
 
 const nullLobby = {
     full: () => true,
     push: (_: any) => false,
     members: () => [] as string[]
 };
-
-class Listener {
-    event: string;
-    handler: (...args: any[]) => void;
-    constructor(event: string, handler: (...args: any[]) => void) {
-        this.event = event;
-        this.handler = handler;
-    }
-}
 
 interface SocketInfo {
     ready: boolean,
