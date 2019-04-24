@@ -1,7 +1,12 @@
 import socket from 'socket.io';
 
-import Lobby from './lib/lobby';
-import Room  from './lib/room';
+import Lobby, { LobbyWatcher } from './lib/lobby';
+import Room from './lib/room';
+
+LobbyWatcher.on('lobby:start', (ID: string, sockets: socket.Socket[]) => {
+    Room.from(ID, sockets);
+    Room.get(ID).start();
+});
 
 /**
  * Adds event listeners to the given socket.

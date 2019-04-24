@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io';
 
 import idGenerator from './id-generator';
+import { EventEmitter } from 'events';
 
 const nullLobby = {
     full: () => true,
@@ -21,6 +22,11 @@ interface SocketInfo {
     ready: boolean,
     listeners: Listener[]
 }
+
+// TODO: Decouple some socket things, simplify methods
+
+/** Has only one event --- 'lobby:start' with ID and sockets list as arguments. */
+export const LobbyWatcher = new EventEmitter();
 
 /** Game lobby class. */
 export default class Lobby {
@@ -56,9 +62,9 @@ export default class Lobby {
 // OBJECT
     /** Unique short identifier. */
     private readonly ID: string;
-
     /** Sockets connected to the lobby. */
     private sockets: Socket[];
+    /** Additional lobby info on each socket. */
     private socketInfo: Map<string, SocketInfo>;
 
     /**
@@ -71,14 +77,18 @@ export default class Lobby {
         this.socketInfo = new Map();
     }
 
+    private ready() {
+        return [...this.socketInfo.values()]
+            .every(info => info.ready);
+    }
+
     private emitEnabled() {
         if (this.sockets.length == 0) {
             return;
         }
         this.sockets[0].emit(
             'lobby:start-enabled',
-            [...this.socketInfo.values()]
-                .every(info => info.ready)
+            this.ready()
         );
     }
 
@@ -112,9 +122,24 @@ export default class Lobby {
                     );
                     this.emitEnabled();
                 }),
-                new Listener('lobby:start', () => {
-                    // TODO: start game
+                new Listener('lobby:start', (ack) => {
                     console.log('Start!');
+                    if (!this.ready()) {
+                        return ack(false);
+                    }
+                    ack(true);
+                    console.log('Success!');
+                    Lobby.full.delete(this.ID);
+                    for (let socket of this.sockets) {
+                        let listeners = this.socketInfo.get(socket.id).listeners;
+                        for (let { event, handler } of listeners) {
+                            socket.removeListener(event, handler);
+                        }
+                    }
+                    LobbyWatcher.emit('lobby:start',
+                        this.ID,
+                        this.sockets
+                    );
                 })
             ];
 

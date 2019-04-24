@@ -26,7 +26,6 @@ export default class RoomView extends View {
         if (!await socket.request('room:check', roomID, Cookies.get('socket'))) {
             return fail(`Room ${roomID} is inaccessible from old socket`);
         }
-        // TODO: join room on server
         if (!await socket.request('room:join', roomID, Cookies.get('socket'))) {
             return fail(`Room ${roomID} is full`);
         }

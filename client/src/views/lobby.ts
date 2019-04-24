@@ -64,8 +64,10 @@ export default class LobbyView extends View {
             socket.emit('lobby:ready');
         };
 
-        $('start').onclick = () => {
-            socket.emit('lobby:start');
+        $('start').onclick = async () => {
+            if (!await socket.request('lobby:start')) {
+                alert('Not everyone is ready');
+            }
         };
 
         if (!await socket.request('lobby:check', lobbyID)) {
