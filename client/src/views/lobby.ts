@@ -36,7 +36,7 @@ export default class LobbyView extends View {
             $(`socket-${socketID}`).innerHTML = socketText(socketID, ready, first);
         })
         .on('lobby:start-enabled', (enabled: boolean) => {
-            $('start').disabled = !enabled;
+            (<HTMLButtonElement> $('start')).disabled = !enabled;
         })
         .on('lobby:left', (socketID: string) => {
             $('mems').removeChild($(`socket-${socketID}`));

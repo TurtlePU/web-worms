@@ -48,10 +48,7 @@ export default class JoinView extends View {
             }
         };
 
-        let goButton = <HTMLButtonElement> $('go');
-        goButton.onclick = this.joinConcrete;
-
-        let rdButton = <HTMLButtonElement> $('random');
-        rdButton.onclick = this.joinRandom;
+        $(  'go'  ).onclick = this.joinConcrete;
+        $('random').onclick = this.joinRandom;
     }
 }

@@ -1,5 +1,5 @@
 /** Shortcut for getElementById. */
-export const $ = document.getElementById.bind(document);
+export const $ = (id: string) => document.getElementById(id);
 
 /** Base class of Views ('pages') of Single-Page Apps. */
 export class View {
