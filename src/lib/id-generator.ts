@@ -19,6 +19,7 @@ function shuffle(array: any[]) {
 
 let digits = [] as string[];
 function toString(num: number) {
+    // FIXME: make fixed length of id
     let ans = '', n = digits.length;
     while (num != 0) {
         ans += `-${digits[num % n]}`;
