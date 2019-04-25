@@ -4,10 +4,11 @@
   "description": "Worms II in your browser. Not affiliated with Team 17.",
   "main": "dist/server.js",
   "scripts": {
-    "compile-server": "rm -rf dist && tsc",
-    "compile-client": "rm -rf client/dist && tsc -p client",
-    "prestart": "npm run compile-server && npm run compile-client",
-    "start": "node dist/server.js"
+    "clean": "rm -rf dist client/dist",
+    "prestart": "npm run clean && tsc && tsc -p client",
+    "start": "node dist/server.js",
+    "watch": "concurrently \"tsc -w\" \"tsc -p client -w\" \"nodemon\"",
+    "serve": "npm run clean && npm run watch"
   },
   "repository": {
     "type": "git",
@@ -21,13 +22,10 @@
   "homepage": "https://github.com/TurtlePU/web-worms#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "immutable": "^4.0.0-rc.12",
-    "shortid": "^2.2.14",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",
-    "@types/shortid": "0.0.29",
     "@types/socket.io": "^2.1.2"
   }
 }
