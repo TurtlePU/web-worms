@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "outDir": "dist",
-        "target": "esnext"
+        "preserveWatchOutput": true,
+        "target": "esnext",
     },
     "files": [
         "src/main.ts"

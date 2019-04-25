@@ -7,8 +7,8 @@
     "clean": "rm -rf dist client/dist",
     "prestart": "npm run clean && tsc && tsc -p client",
     "start": "node dist/server.js",
-    "watch": "concurrently \"tsc -w\" \"tsc -p client -w\" \"nodemon\"",
-    "serve": "npm run clean && npm run watch"
+    "watch": "concurrently -n \"TS server,TS client, nodemon \" -c cyanBright,blueBright,magentaBright -p name \"tsc -w\" \"tsc -p client -w\" \"nodemon\"",
+    "serve": "npm run prestart && npm run watch"
   },
   "repository": {
     "type": "git",
