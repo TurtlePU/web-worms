@@ -1,6 +1,6 @@
 const { floor, pow, random } = Math;
 
-let id: IterableIterator<number>;
+var id: IterableIterator<number>;
 function* ShuffledGenerator(N: number) {
     let index = 0;
     let order = shuffle([...new Array(N).keys()]);
@@ -17,11 +17,11 @@ function shuffle(array: any[]) {
     return array;
 }
 
-let digits = [] as string[];
+var digits: string[];
+var idLength: number;
 function toString(num: number) {
-    // FIXME: make fixed length of id
     let ans = '', n = digits.length;
-    while (num != 0) {
+    for (let i = 0; i != idLength; ++i) {
         ans += `-${digits[num % n]}`;
         num = floor(num / n);
     }
@@ -35,6 +35,7 @@ function toString(num: number) {
  */
 export function initIdGenerator(words: string[], length: number) {
     digits = words;
+    idLength = length;
     const N = pow(digits.length, length);
     id = ShuffledGenerator(N);
 };
