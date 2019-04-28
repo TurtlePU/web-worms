@@ -61,7 +61,7 @@ export default class LobbyView extends View {
         };
 
         $('ready').onclick = () => {
-            socket.emit('lobby:ready');
+            socket.emit('lobby:ready', (<HTMLInputElement>$('ready')).checked);
         };
 
         $('start').onclick = async () => {

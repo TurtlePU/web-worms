@@ -1,77 +1,90 @@
-import { EventEmitter } from 'events';
 import { Socket } from 'socket.io';
 
-import idGenerator from './id-generator';
-import Listener from './socket-listener';
+import nextID from './id-generator';
 
-const nullLobby = {
-    full: () => true,
-    push: (_: any) => false,
-    members: () => [] as string[]
-};
+import {
+    Handler,
+    ISocketRoom,
+    Pool,
+    SocketInfo,
+    SocketRoom
+} from './room/export';
 
-interface SocketInfo {
-    ready: boolean,
-    listeners: Listener[]
+class LobbyPool extends Pool<ILobby> {
+    /** IDs of lobbies which have vacant places. */
+    private vacants: Set<String>;
+
+    /** @override in LobbyPool. */
+    constructor() {
+        super({
+            id: 'lobby dummy',
+            full: () => true,
+            add: (_: any) => false,
+            members: () => []
+        });
+        this.vacants = new Set();
+    }
+
+    /** @override in LobbyPool. */
+    protected add(lobby: Lobby) {
+        this.vacants.add(lobby.id);
+        lobby
+        .on('full', () => {
+            this.vacants.delete(lobby.id);
+        })
+        .on('start', () => {
+            this.emit('start',
+                lobby.id,
+                lobby.socketList
+            );
+        })
+        .on('vacant', () => {
+            this.vacants.add(lobby.id);
+        });
+        return super.add(lobby);
+    }
+
+    /** First lobby which has vacant places. */
+    firstVacant() {
+        if (this.vacants.size == 0) {
+            this.add(new Lobby());
+        }
+        return this.pool.get(
+            this.vacants.values().next().value
+        );
+    }
 }
 
-// TODO: Decouple some socket things, simplify methods
+export default new LobbyPool();
 
-/** Has only one event --- 'lobby:start' with ID and sockets list as arguments. */
-export const LobbyWatcher = new EventEmitter();
+interface ILobby extends ISocketRoom {
+    /** @returns true if lobby is full. */
+    full(): boolean,
+    /** @returns list of connected sockets' IDs. */
+    members(): ClientInfo[]
+}
 
-/** Game lobby class. */
-export default class Lobby {
-// STATIC
-    /** Available lobbies. */
-    private static pool = new Map<string, Lobby>();
-
-    /** Filled lobbies. */
-    private static full = new Map<string, Lobby>();
-
-    /** Maximum number of players. */
+class Lobby extends SocketRoom<Info> implements ILobby {
+    /** Max number of players in one lobby. */
     private static readonly CAPACITY = 4;
 
-    /**
-     * @returns ID of a joinable lobby (if there are none, creates new)
-     */
-    static ID() {
-        if (Lobby.pool.size == 0) {
-            let lobby = new Lobby();
-            Lobby.pool.set(lobby.ID, lobby);
+    /** Makes new lobby with human-readable random id. */
+    constructor() {
+        super(nextID());
+    }
+
+    add(socket: Socket) {
+        if (this.full()) {
+            return false;
+        } else {
+            super.add(socket);
+            this.emitJoin(socket);
+            this.emitEnabled();
+            if (this.full()) {
+                this.emit('full');
+            }
+            return true;
         }
-        return Lobby.pool.keys().next().value;
-    }
-
-    /**
-     * @param ID - ID of some lobby
-     * @returns Lobby if it is joinable 
-     */
-    static get(ID: string) {
-        return Lobby.pool.get(ID) || Lobby.full.get(ID) || nullLobby;
-    }
-
-// OBJECT
-    /** Unique short identifier. */
-    private readonly ID: string;
-    /** Sockets connected to the lobby. */
-    private sockets: Socket[];
-    /** Additional lobby info on each socket. */
-    private socketInfo: Map<string, SocketInfo>;
-
-    /**
-     * @constructor
-     * Creates new Lobby with random ID.
-     */
-    private constructor() {
-        this.ID = idGenerator();
-        this.sockets = [];
-        this.socketInfo = new Map();
-    }
-
-    private ready() {
-        return [...this.socketInfo.values()]
-            .every(info => info.ready);
     }
 
     private emitEnabled() {
@@ -84,80 +97,59 @@ export default class Lobby {
         );
     }
 
-    /**
-     * Adds given socket to the lobby list.
-     * @param socket
-     * @returns true if socket was pushed, false if lobby is full
-     */
-    push(socket: Socket) {
-        if (this.full()) {
-            return false;
-        } else {
-            this.sockets.push(socket);
+    private emitJoin(socket: Socket) {
+        socket.server
+        .to(this.id)
+        .emit('lobby:join',
+            socket.id,
+            false,
+            socket.id == this.sockets[0].id
+        );
+    }
 
-            const leave = () => {
-                this.remove(socket);
-                socket.server.to(this.ID).emit('lobby:left', socket.id);
-                this.emitEnabled();
-            };
+    private emitLeft(socket: Socket) {
+        socket.server
+        .to(this.id)
+        .emit('lobby:left', socket.id);
+    }
 
-            const listeners = [
-                new Listener('lobby:left', leave),
-                new Listener('disconnect', leave),
-                new Listener('lobby:ready', () => {
-                    let info = this.socketInfo.get(socket.id);
-                    info.ready = !info.ready;
-                    socket.server.to(this.ID).emit('lobby:ready',
-                        socket.id,
-                        info.ready,
-                        socket.id == this.sockets[0].id
-                    );
-                    this.emitEnabled();
-                }),
-                new Listener('lobby:start', (ack) => {
-                    console.log('Start!');
-                    if (!this.ready()) {
-                        return ack(false);
-                    }
-                    ack(true);
-                    console.log('Success!');
-                    Lobby.full.delete(this.ID);
-                    for (let socket of this.sockets) {
-                        let listeners = this.socketInfo.get(socket.id).listeners;
-                        for (let { event, handler } of listeners) {
-                            socket.removeListener(event, handler);
-                        }
-                    }
-                    LobbyWatcher.emit('lobby:start',
-                        this.ID,
-                        this.sockets
-                    );
-                })
-            ];
+    private emitReady(socket: Socket) {
+        socket.server
+        .to(this.id)
+        .emit('lobby:ready',
+            socket.id,
+            this.socketInfo.get(socket.id).ready,
+            socket.id == this.sockets[0].id
+        );
+    }
 
-            socket.join(this.ID);
-            for (let { event, handler } of listeners) {
-                socket.on(event, handler);
-            }
-            socket.server.to(this.ID).emit('lobby:join',
-                socket.id,
-                false,
-                socket.id == this.sockets[0].id
-            );
+    full() {
+        return this.sockets.length == Lobby.CAPACITY;
+    }
 
-            this.socketInfo.set(socket.id, {
-                ready: false,
-                listeners
-            });
+    protected handlers(socket: Socket) {
+        const leave = () => {
+            this.remove(socket);
+            this.emitLeft(socket);
             this.emitEnabled();
-
-            if (this.full()) {
-                Lobby.pool.delete(this.ID);
-                Lobby.full.set(this.ID, this);
-            }
-
-            return true;
-        }
+        };
+        return [
+            new Handler('lobby:left', leave),
+            new Handler('disconnect', leave),
+            new Handler('lobby:ready', (ready) => {
+                this.socketInfo.get(socket.id).ready = ready;
+                this.emitReady(socket);
+                this.emitEnabled();
+            }),
+            new Handler('lobby:start', (ack) => {
+                if (!this.ready()) {
+                    return ack(false);
+                }
+                ack(true);
+                this.disconnectAll();
+                this.emit('start');
+            })
+        ];
     }
 
     members() {
@@ -170,35 +162,34 @@ export default class Lobby {
         });
     }
 
-    /**
-     * @returns true if lobby is full, false otherwise
-     */
-    full() {
-        return this.sockets.length == Lobby.CAPACITY;
+    private ready() {
+        return [...this.socketInfo.values()]
+            .every(info => info.ready);
     }
 
-    /**
-     * Removes given socket from lobby list.
-     * @param socket
-     * @returns true if socket was removed, false if not found
-     */
+    /** @override in Lobby. */
     remove(socket: Socket) {
-        let index = this.sockets.findIndex(element => {
-            return element.id == socket.id;
-        });
-        if (index != -1) {
-            this.sockets.splice(index, 1);
-
-            socket.leave(this.ID);
-            for (let { event, handler } of this.socketInfo.get(socket.id).listeners) {
-                socket.removeListener(event, handler);
-            }
-
-            this.socketInfo.delete(socket.id);
-
-            Lobby.full.delete(this.ID);
-            Lobby.pool.set(this.ID, this);
+        if(super.remove(socket)) {
+            this.emit('vacant');
+            return true;
         }
-        return index != -1;
+        return false;
     }
-};
+
+    protected SocketInfo(handlers: Handler[]) {
+        return {
+            ready: false,
+            handlers
+        };
+    }
+}
+
+interface Info extends SocketInfo {
+    ready: boolean
+}
+
+interface ClientInfo {
+    id: string,
+    ready: boolean,
+    first: boolean
+}

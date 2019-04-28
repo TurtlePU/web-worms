@@ -1,11 +1,11 @@
 import socket from 'socket.io';
 
-import Lobby, { LobbyWatcher } from './lib/lobby';
+import Lobby from './lib/lobby';
 import Room from './lib/room';
 
-LobbyWatcher.on('lobby:start', (ID: string, sockets: socket.Socket[]) => {
-    Room.from(ID, sockets);
-    Room.get(ID).start();
+Lobby.on('start', (id: string, sockets: socket.Socket[]) => {
+    Room.from(id, sockets);
+    Room.get(id).start();
 });
 
 /**
@@ -17,13 +17,13 @@ export default function(socket: socket.Socket) {
 
     socket
     .on('lobby:get', ack => {
-        ack(Lobby.ID());
+        ack(Lobby.firstVacant().id);
     })
     .on('lobby:check', (lobbyID, ack) => {
         ack(!Lobby.get(lobbyID).full());
     })
     .on('lobby:join', (lobbyID, ack) => {
-        ack(Lobby.get(lobbyID).push(socket));
+        ack(Lobby.get(lobbyID).add(socket));
     })
     .on('lobby:members', (lobbyID, ack) => {
         ack(Lobby.get(lobbyID).members());

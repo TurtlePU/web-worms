@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import Listener from './socket-listener';
+import Listener from './room/handler';
 
 const nullRoom = {
     had: (_: any) => false,
