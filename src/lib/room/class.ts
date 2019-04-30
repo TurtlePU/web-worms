@@ -23,8 +23,7 @@ export abstract class SocketRoom <
     protected constructor(id: string) {
         super();
         this.id = id;
-        this.sockets = [];
-        this.socketInfo = new Map();
+        this.flush();
     }
 
     get socketList() {
@@ -42,6 +41,38 @@ export abstract class SocketRoom <
         );
         this.connect(socket);
         return true;
+    }
+
+    /**
+     * Broadcasts message to all its sockets.
+     * @param event
+     * @param args
+     */
+    cast(event: string | symbol, ...args: any[]) {
+        return this.sockets.length &&
+               this.sockets[0].server.to(this.id).emit(event, ...args);
+    }
+
+    flush() {
+        this.sockets = [];
+        this.socketInfo = new Map();
+    }
+
+    /**
+     * Removes socket from the list, deletes room-specific handlers.
+     * @param socket - socket to remove.
+     */
+    remove(socket: Socket) {
+        let index = this.sockets.findIndex(element => {
+            return element.id == socket.id;
+        });
+        if (index != -1) {
+            this.sockets.splice(index, 1);
+            socket.leave(this.id);
+            this.disconnect(socket);
+            this.socketInfo.delete(socket.id);
+        }
+        return index != -1;
     }
 
     /**
@@ -85,21 +116,4 @@ export abstract class SocketRoom <
      * @param handlers 
      */
     protected abstract SocketInfo(handlers: Handler[]): SInfo
-
-    /**
-     * Removes socket from the list, deletes room-specific handlers.
-     * @param socket - socket to remove.
-     */
-    remove(socket: Socket) {
-        let index = this.sockets.findIndex(element => {
-            return element.id == socket.id;
-        });
-        if (index != -1) {
-            this.sockets.splice(index, 1);
-            socket.leave(this.id);
-            this.disconnect(socket);
-            this.socketInfo.delete(socket.id);
-        }
-        return index != -1;
-    }
 }

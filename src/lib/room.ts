@@ -1,84 +1,111 @@
 import { Socket } from 'socket.io';
 
-import { Handler } from './room/handler';
+import {
+    Handler,
+    ISocketRoom,
+    Pool,
+    SocketInfo,
+    SocketRoom
+} from './room/export';
 
-const nullRoom = {
-    had: (_: any) => false,
-    start: () => {},
-    push: (_: any) => false
-};
+import { game, physics } from '../data/export';
 
-/** Game room class. */
-export default class Room {
-// STATIC
-    /** Live rooms. */
-    private static pool = new Map<string, Room>();
+class RoomPool extends Pool<IRoom> {
+    /** @override in RoomPool. */
+    constructor() {
+        super({
+            id: 'room dummy',
+            add: (_: any) => false,
+            flush: () => {},
+            had: (_: any) => false,
+            start: () => {}
+        });
+    }
 
-    /**
-     * Makes new room from given params.
-     * @param ID 
-     * @param sockets 
-     */
-    static from(ID: string, sockets: Socket[]) {
-        Room.pool.set(ID, new Room(ID, sockets));
+    /** @override in RoomPool. */
+    protected add(room: Room) {
+        room
+        .on('end', () => {
+            this.emit('end', room.id);
+        });
+        return super.add(room);
     }
 
     /**
-     * @param ID - ID of some room
-     * @returns Room by given ID
+     * Adds new Room made from Lobby info.
+     * @param id - id of Lobby (Room)
+     * @param sockets - list of connected sockets
      */
-    static get(ID: string) {
-        return Room.pool.get(ID) || nullRoom;
+    from(id: string, sockets: Socket[]) {
+        this.add(new Room(id, sockets));
     }
+}
 
-// OBJECT
-    /** Unique short identifier. */
-    private readonly ID: string;
-    /** Sockets currently connected to the room. */
-    private sockets: Socket[];
-    /** IDs of Sockets previously connected to the room. */
+export default new RoomPool();
+
+interface IRoom extends ISocketRoom {
+    /** @override in Room. */
+    add(socket: Socket): boolean,
+
+    /**
+     * @param id
+     * @returns true if socket by given id was connected to the room previously 
+     */
+    had(id: string): boolean,
+
+    /** Sets the environments, emits 'game:start' to players. */
+    start(): void
+}
+
+class Room extends SocketRoom<Info> implements IRoom {
+    /** List of previously connected sockets' IDs. */
     private oldSockets: Set<string>;
-    /** Game settings. */
-    private readonly schemes = {
-        physics: {
-            // TODO: physics settings
-        },
-        game: {
-            // TODO: game settings
-        }
-    };
-
-    private constructor(ID: string, sockets: Socket[]) {
-        this.ID = ID;
-        this.sockets = sockets;
-        this.oldSockets = new Set(sockets.map(socket => socket.id));
-    }
 
     /**
-     * Sets the environments, emits the game:start event to sockets.
+     * Makes new Room from given Lobby info.
+     * @param id
+     * @param sockets
      */
-    start() {
-        // TODO: Room.start()
+    constructor(id: string, sockets: Socket[]) {
+        super(id);
+        this.oldSockets = new Set();
+        sockets.forEach(socket => this.add(socket));
     }
 
-    push(socket: Socket) {
-        // FIXME: Room.push -- unit operation of start() & reconnect
-        const listeners = [
+    protected handlers(socket: Socket) {
+        // TODO: Room.handlers
+        return [
             new Handler('room:scheme:physics', (ack) => {
-                ack(this.schemes.physics);
+                ack(physics.basic);
             }),
             new Handler('room:scheme:game', (ack) => {
-                ack(this.schemes.game);
+                ack(game.basic);
             })
         ];
-        return true;
     }
 
-    /**
-     * @param socketID - ID of some socket
-     * @returns true if given socket was connected to this room, false otherwise
-     */
-    had(socketID: string) {
-        return this.oldSockets.has(socketID);
+    protected SocketInfo(handlers: Handler[]) {
+        // TODO: Room.SocketInfo
+        return {
+            handlers
+        };
     }
-};
+
+    add(socket: Socket) {
+        this.oldSockets.add(socket.id);
+        return super.add(socket);
+    }
+
+    had(id: string) {
+        return this.oldSockets.has(id);
+    }
+
+    start() {
+        // TODO: Room.start: start the environments
+        this.cast('game:start');
+    }
+}
+
+interface Info extends SocketInfo {
+    // TODO: Room:Info
+}

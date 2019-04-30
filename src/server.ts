@@ -7,7 +7,7 @@ import socket  from 'socket.io';
 import listen  from './socket';
 
 import { initIdGenerator } from './lib/id-generator';
-import digits from './data/id-digits.json';
+import { digits } from './data/export';
 
 initIdGenerator(digits, 3);
 

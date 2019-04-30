@@ -18,8 +18,9 @@ class LobbyPool extends Pool<ILobby> {
     constructor() {
         super({
             id: 'lobby dummy',
-            full: () => true,
             add: (_: any) => false,
+            flush: () => {},
+            full: () => true,
             members: () => []
         });
         this.vacants = new Set();
@@ -52,6 +53,15 @@ class LobbyPool extends Pool<ILobby> {
         return this.pool.get(
             this.vacants.values().next().value
         );
+    }
+
+    /**
+     * Makes Lobby on given id empty
+     * @param id
+     */
+    flush(id: string) {
+        this.get(id).flush();
+        this.vacants.add(id);
     }
 }
 
@@ -98,9 +108,7 @@ class Lobby extends SocketRoom<Info> implements ILobby {
     }
 
     private emitJoin(socket: Socket) {
-        socket.server
-        .to(this.id)
-        .emit('lobby:join',
+        this.cast('lobby:join',
             socket.id,
             false,
             socket.id == this.sockets[0].id
@@ -108,15 +116,11 @@ class Lobby extends SocketRoom<Info> implements ILobby {
     }
 
     private emitLeft(socket: Socket) {
-        socket.server
-        .to(this.id)
-        .emit('lobby:left', socket.id);
+        this.cast('lobby:left', socket.id);
     }
 
     private emitReady(socket: Socket) {
-        socket.server
-        .to(this.id)
-        .emit('lobby:ready',
+        this.cast('lobby:ready',
             socket.id,
             this.socketInfo.get(socket.id).ready,
             socket.id == this.sockets[0].id

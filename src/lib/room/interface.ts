@@ -7,5 +7,6 @@ export interface ISocketRoom {
      * Adds socket to the room, sets room-specific handlers.
      * @param socket - socket to add.
      */
-    add(socket: Socket): boolean
+    add(socket: Socket): boolean,
+    flush(): void
 }

@@ -1,11 +1,15 @@
 import socket from 'socket.io';
 
 import Lobby from './lib/lobby';
-import Room from './lib/room';
+import Room  from './lib/room';
 
 Lobby.on('start', (id: string, sockets: socket.Socket[]) => {
     Room.from(id, sockets);
     Room.get(id).start();
+});
+
+Room.on('end', (id: string) => {
+    Lobby.flush(id);
 });
 
 /**
@@ -36,7 +40,7 @@ export default function(socket: socket.Socket) {
     .on('room:join', (roomID, socketID, ack) => {
         ack(
             Room.get(roomID).had(socketID) &&
-            Room.get(roomID).push(socket)
+            Room.get(roomID).add(socket)
         );
     });
 
