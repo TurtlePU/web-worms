@@ -1,5 +1,5 @@
 // TODO: physics engine
-export default class Physics {
+export class Physics {
     constructor(...args: any[]) {
         //
     }

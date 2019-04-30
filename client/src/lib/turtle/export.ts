@@ -4,22 +4,22 @@ export const $ = (id: string) => document.getElementById(id);
 /** Base class of Views ('pages') of Single-Page Apps. */
 export class View {
     /** ID of a View. Good practice is to use it as a route for Router. */
-    readonly ID: string;
-
-    private readonly HTML: string;
+    readonly id: string;
+    /** HTML to be set when View is loaded. */
+    private readonly html: string;
 
     /**
      * @constructor
-     * Constructs View from given ID and HTML.
+     * Constructs View from given id and html.
      * Good practice is to predefine them in inherited Views.
-     * @param ID
-     * @param HTML
+     * @param id
+     * @param html
      */
-    constructor(ID: string, HTML: string) {
-        console.log(`'${ID}'.constructor()`);
+    constructor(id: string, html: string) {
+        console.log(`'${id}'.constructor()`);
 
-        this.ID = ID;
-        this.HTML = HTML;
+        this.id = id;
+        this.html = html;
 
         this.load = this.load.bind(this);
     }
@@ -31,7 +31,7 @@ export class View {
      * @param _args - any load properties defined in subclasses
      */
     load(path: string, ..._args: any) {
-        console.log(`'${this.ID}'.load('${path}')`);
-        document.body.innerHTML = this.HTML;
+        console.log(`'${this.id}'.load('${path}')`);
+        document.body.innerHTML = this.html;
     }
 };

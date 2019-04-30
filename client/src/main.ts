@@ -12,9 +12,10 @@ window.onload = async () => {
     const lobbyView = new LobbyView();
     const roomView  = new RoomView();
 
-    Router.root(joinView.ID)
-        .add(joinView.ID,   joinView.load)
-        .add(/lobby\/(.+)/, lobbyView.load)
-        .add(/room\/(.+)/,  roomView.load)
-        .listen().navigate();
+    Router
+    .setRoot(joinView.id)
+    .add(joinView.id,   joinView.load)
+    .add(/lobby\/(.+)/, lobbyView.load)
+    .add(/room\/(.+)/,  roomView.load)
+    .listen().navigate();
 };

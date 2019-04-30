@@ -1,5 +1,5 @@
 // TODO: graphics engine
-export default class Graphics {
+export class Graphics {
     constructor(...args: any[]) {
         //
     }

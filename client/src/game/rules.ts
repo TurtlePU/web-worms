@@ -1,5 +1,5 @@
 // TODO: game rules
-export default class GameRules {
+export class Rules {
     constructor(...args: any[]) {
         //
     }

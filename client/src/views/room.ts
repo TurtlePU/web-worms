@@ -1,13 +1,11 @@
 ///<reference path='../lib/js.cookie.d.ts'/>
 
-import { View } from '../lib/turtle/main.js';
+import { View } from '../lib/turtle/export.js';
 import Router from '../lib/turtle/router.js';
 
 import { socket } from '../lib/socket/wrapper.js';
 
-import GameRules from '../game/game-rules.js';
-import Graphics  from '../game/graphics.js';
-import Physics   from '../game/physics.js';
+import { Graphics, Physics, Rules } from '../game/export.js';
 
 const html = /* html */`
 `;
@@ -18,9 +16,9 @@ function fail(message: string) {
 }
 
 export default class RoomView extends View {
-    private gameRules: GameRules;
     private graphics: Graphics;
     private physics: Physics;
+    private rules: Rules;
 
     constructor() {
         super('room', html);
@@ -43,8 +41,8 @@ export default class RoomView extends View {
 
         // TODO: init UI
 
-        this.gameRules = new GameRules(await socket.request('room:scheme:game'));
-        this.graphics  = new Graphics();
-        this.physics   = new Physics(await socket.request('room:scheme:physics'));
+        this.graphics = new Graphics();
+        this.physics  = new Physics(await socket.request('room:scheme:physics'));
+        this.rules    = new Rules(await socket.request('room:scheme:game'));
     }
 }
