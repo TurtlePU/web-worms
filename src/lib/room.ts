@@ -102,7 +102,7 @@ class Room extends SocketRoom<Info> implements IRoom {
 
     start() {
         // TODO: Room.start: start the environments
-        this.cast('game:start');
+        this.cast('room:start', this.id);
     }
 }
 

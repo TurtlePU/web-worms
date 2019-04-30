@@ -25,6 +25,7 @@ export default class RoomView extends View {
 
         socket
         .on('room:start', (roomID: string) => {
+            Cookies.set('socket', socket.id);
             Router.navigate(`room/${roomID}`);
         })
     }

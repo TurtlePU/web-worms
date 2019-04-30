@@ -34,6 +34,7 @@ class LobbyPool extends Pool<ILobby> {
             this.vacants.delete(lobby.id);
         })
         .on('start', () => {
+            this.vacants.delete(lobby.id);
             this.emit('start',
                 lobby.id,
                 lobby.socketList
