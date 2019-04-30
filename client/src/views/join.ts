@@ -1,7 +1,7 @@
 import { $, View } from '../lib/turtle/export.js';
 import Router from '../lib/turtle/router.js';
 
-import { socket } from '../lib/socket/wrapper.js';
+import socket from '../lib/socket/wrapper.js';
 
 // TODO: reconnect button
 

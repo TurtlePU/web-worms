@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import Listener from './room/handler';
+import { Handler } from './room/handler';
 
 const nullRoom = {
     had: (_: any) => false,
@@ -64,10 +64,10 @@ export default class Room {
     push(socket: Socket) {
         // FIXME: Room.push -- unit operation of start() & reconnect
         const listeners = [
-            new Listener('room:scheme:physics', (ack) => {
+            new Handler('room:scheme:physics', (ack) => {
                 ack(this.schemes.physics);
             }),
-            new Listener('room:scheme:game', (ack) => {
+            new Handler('room:scheme:game', (ack) => {
                 ack(this.schemes.game);
             })
         ];
