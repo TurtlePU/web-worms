@@ -3,12 +3,11 @@ import Router from '../lib/turtle/router.js';
 
 import socket from '../lib/socket/wrapper.js';
 
-// TODO: reconnect button
-
 const html = /* html */`
     <h1>Worms II</h1>
     <input type='text' id='lobby-id' placeholder='Lobby/Room ID'>
     <button id='go'>Go</button> <button id='random'>I'm lucky</button>
+    <button id='reconnect'>Reconnect</button>
 `;
 
 export default class JoinView extends View {
@@ -16,14 +15,7 @@ export default class JoinView extends View {
 
     constructor() {
         super('join', html);
-
-        this.joinRandom = this.joinRandom.bind(this);
         this.joinConcrete = this.joinConcrete.bind(this);
-    }
-
-    private async joinRandom() {
-        let id = await socket.request('lobby:get');
-        Router.navigate(`lobby/${id}`);
     }
 
     private async joinConcrete() {
@@ -48,7 +40,15 @@ export default class JoinView extends View {
             }
         };
 
-        $(  'go'  ).onclick = this.joinConcrete;
-        $('random').onclick = this.joinRandom;
+        $('go').onclick = () => this.joinConcrete();
+
+        $('random').onclick = async () => {
+            let id = await socket.request('lobby:get');
+            Router.navigate(`lobby/${id}`);
+        };
+
+        $('reconnect').onclick = () => {
+            Router.navigate(`room/${Cookies.get('room')}`);
+        };
     }
 }

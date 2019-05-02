@@ -41,9 +41,8 @@ export default class RoomView extends View {
             return fail(`Room ${roomID} is full`);
         }
 
+        Cookies.set('room', roomID);
         Router.unlisten();
-
-        // TODO: init UI
 
         $('quit').onclick = () => Router.listen().navigate('join').check();
 

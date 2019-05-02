@@ -73,7 +73,6 @@ class Room extends SocketRoom<Info> implements IRoom {
     }
 
     protected handlers(socket: Socket) {
-        // TODO: Room.handlers
         return [
             new Handler('room:scheme:physics', (ack) => {
                 ack(physics.basic);
@@ -85,7 +84,6 @@ class Room extends SocketRoom<Info> implements IRoom {
     }
 
     protected SocketInfo(handlers: Handler[]) {
-        // TODO: Room.SocketInfo
         return {
             handlers
         };
@@ -109,6 +107,4 @@ class Room extends SocketRoom<Info> implements IRoom {
     }
 }
 
-interface Info extends SocketInfo {
-    // TODO: Room:Info
-}
+interface Info extends SocketInfo {}
