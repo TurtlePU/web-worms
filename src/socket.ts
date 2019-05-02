@@ -20,24 +20,24 @@ export default function(socket: socket.Socket) {
     console.log('+ socket');
 
     socket
-    .on('lobby:get', ack => {
+    .on('lobby:get', (ack: (_: string) => void) => {
         ack(Lobby.firstVacant().id);
     })
-    .on('lobby:check', (lobbyID, ack) => {
+    .on('lobby:check', (lobbyID: string, ack: (_: boolean) => void) => {
         ack(!Lobby.get(lobbyID).full());
     })
-    .on('lobby:join', (lobbyID, ack) => {
+    .on('lobby:join', (lobbyID: string, ack: (_: boolean) => void) => {
         ack(Lobby.get(lobbyID).add(socket));
     })
-    .on('lobby:members', (lobbyID, ack) => {
+    .on('lobby:members', (lobbyID: string, ack: (_: any[]) => void) => {
         ack(Lobby.get(lobbyID).members());
     });
 
     socket
-    .on('room:check', (roomID, socketID, ack) => {
+    .on('room:check', (roomID: string, socketID: string, ack: (_: boolean) => void) => {
         ack(Room.get(roomID).had(socketID));
     })
-    .on('room:join', (roomID, socketID, ack) => {
+    .on('room:join', (roomID: string, socketID: string, ack: (_: boolean) => void) => {
         ack(
             Room.get(roomID).had(socketID) &&
             Room.get(roomID).add(socket)

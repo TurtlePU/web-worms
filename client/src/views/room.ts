@@ -1,6 +1,6 @@
 ///<reference path='../lib/js.cookie.d.ts'/>
 
-import { View } from '../lib/turtle/export.js';
+import { $, View } from '../lib/turtle/export.js';
 import Router from '../lib/turtle/router.js';
 
 import socket from '../lib/socket/wrapper.js';
@@ -8,6 +8,7 @@ import socket from '../lib/socket/wrapper.js';
 import { Graphics, Physics, Rules } from '../game/export.js';
 
 const html = /* html */`
+    <button id='quit'>Quit</button>
 `;
 
 function fail(message: string) {
@@ -27,7 +28,7 @@ export default class RoomView extends View {
         .on('room:start', (roomID: string) => {
             Cookies.set('socket', socket.id);
             Router.navigate(`room/${roomID}`);
-        })
+        });
     }
 
     async load(path: string, roomID: string) {
@@ -40,7 +41,11 @@ export default class RoomView extends View {
             return fail(`Room ${roomID} is full`);
         }
 
+        Router.unlisten();
+
         // TODO: init UI
+
+        $('quit').onclick = () => Router.listen().navigate('join').check();
 
         this.graphics = new Graphics();
         this.physics  = new Physics(await socket.request('room:scheme:physics'));

@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
+        "noImplicitAny": true,
         "outDir": "dist",
         "preserveWatchOutput": true,
-        "target": "esnext",
+        "target": "es6",
     },
     "files": [
         "src/main.ts"

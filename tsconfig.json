@@ -6,8 +6,8 @@
         "noImplicitAny": true,
         "outDir": "dist",
         "preserveWatchOutput": true,
+        "resolveJsonModule": true,
         "target": "es6",
-        "resolveJsonModule": true
     },
     "files": [
         "src/server.ts",

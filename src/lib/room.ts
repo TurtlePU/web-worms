@@ -92,8 +92,11 @@ class Room extends SocketRoom<Info> implements IRoom {
     }
 
     add(socket: Socket) {
-        this.oldSockets.add(socket.id);
-        return super.add(socket);
+        if (!this.oldSockets.has(socket.id)) {
+            this.oldSockets.add(socket.id);
+            return super.add(socket);
+        }
+        return true;
     }
 
     had(id: string) {
