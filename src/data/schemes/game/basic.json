@@ -1,3 +1,12 @@
 {
-    "_comment": "// TODO: game scheme"
+    "crates": [
+        "heal",
+        "util",
+        "weapon"
+    ],
+    "dropChance": 0.5,
+    "gameTime": 1800000,
+    "retreatTime": 5000,
+    "turnTime": 30000,
+    "wormCount": 4
 }

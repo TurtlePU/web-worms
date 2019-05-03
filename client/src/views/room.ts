@@ -57,6 +57,7 @@ export default class RoomView extends View {
 
         $('quit').onclick = () => {
             this.animate = false;
+            socket.emit('room:left');
             Router.listen().navigate('join').check();
         }
 
@@ -67,5 +68,7 @@ export default class RoomView extends View {
         this.animate = true;
         this.last = performance.now();
         requestAnimationFrame(this.draw);
+
+        socket.emit('game:ready');
     }
 }
