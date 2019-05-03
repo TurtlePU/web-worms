@@ -8,7 +8,8 @@ import socket from '../lib/socket/wrapper.js';
 import { Graphics, Physics, Rules } from '../game/export.js';
 
 const html = /* html */`
-    <button id='quit'>Quit</button>
+    <div><canvas id='canvas'></canvas></div>
+    <div><button id='quit'>Quit</button></div>
 `;
 
 function fail(message: string) {
@@ -17,9 +18,8 @@ function fail(message: string) {
 }
 
 export default class RoomView extends View {
-    private graphics: Graphics;
-    private physics: Physics;
-    private rules: Rules;
+    private animate: boolean;
+    private last: number;
 
     constructor() {
         super('room', html);
@@ -29,6 +29,17 @@ export default class RoomView extends View {
             Cookies.set('socket', socket.id);
             Router.navigate(`room/${roomID}`);
         });
+
+        this.draw = this.draw.bind(this);
+    }
+
+    private draw(time: number) {
+        Physics.update(time - this.last);
+        this.last = time;
+        Graphics.render();
+        if (this.animate) {
+            requestAnimationFrame(this.draw);
+        }
     }
 
     async load(path: string, roomID: string) {
@@ -44,10 +55,21 @@ export default class RoomView extends View {
         Cookies.set('room', roomID);
         Router.unlisten();
 
-        $('quit').onclick = () => Router.listen().navigate('join').check();
+        $('quit').onclick = () => {
+            this.animate = false;
+            Router.listen().navigate('join').check();
+        }
 
-        this.graphics = new Graphics();
-        this.physics  = new Physics(await socket.request('room:scheme:physics'));
-        this.rules    = new Rules(await socket.request('room:scheme:game'));
+        $('canvas').onclick = event => {
+            Physics.addDot(event.offsetX, event.offsetY);
+        };
+
+        Graphics.init(<HTMLCanvasElement> $('canvas'));
+        Physics.init(await socket.request('room:scheme:physics'));
+        Rules.init(await socket.request('room:scheme:game'));
+
+        this.animate = true;
+        this.last = performance.now();
+        requestAnimationFrame(this.draw);
     }
 }

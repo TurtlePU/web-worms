@@ -1,6 +1,8 @@
 // TODO: game rules
-export class Rules {
-    constructor(...args: any[]) {
+class GameEngine {
+    init(...args: any[]) {
         //
     }
 }
+
+export const Rules = new GameEngine();
