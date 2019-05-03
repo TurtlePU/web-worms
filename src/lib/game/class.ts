@@ -67,6 +67,7 @@ export default class Game extends EventEmitter {
         // TODO: sudden death
     }
 
+    // TODO: change architecture a little --- get from physics how much to wait
     private async turn() {
         let player = this.nextPlayer();
         if (this.death) {
