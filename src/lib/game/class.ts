@@ -16,6 +16,9 @@ export default class Game extends EventEmitter {
     private players: Player[];
     private index: number;
 
+    private waitTimeout: NodeJS.Timeout;
+    private resolve: Function;
+
     constructor(physicsScheme: any, gameScheme: any) {
         super();
 
@@ -60,26 +63,6 @@ export default class Game extends EventEmitter {
         return this.players[i];
     }
 
-    private async ready(playerID: string) {
-        return new Promise((resolve, reject) => {
-            let timeout: NodeJS.Timeout;
-            let interrupt = {
-                event: 'ready',
-                handler: (id: string) => {
-                    if (id == playerID) {
-                        clearTimeout(timeout);
-                        resolve();
-                    }
-                }
-            };
-            this.once(interrupt.event, interrupt.handler);
-            timeout = setTimeout(() => {
-                this.removeListener(interrupt.event, interrupt.handler);
-                reject();
-            }, THROW_TIMEOUT);
-        });
-    }
-
     private suddenDeath() {
         // TODO: sudden death
     }
@@ -88,10 +71,10 @@ export default class Game extends EventEmitter {
         let player = this.nextPlayer();
         if (this.death) {
             this.suddenDeath();
-            await this.ready(player.id);
+            await this.ready();
         }
         this.dropCrates();
-        await this.ready(player.id);
+        await this.ready();
         // TODO: set correct game state
         this.emit('turn', player.nextWorm());
         await this.wait(this.scheme.turnTime);
@@ -101,21 +84,24 @@ export default class Game extends EventEmitter {
         this.increaseWaterLevel();
     }
 
+    interrupt(id: string) {
+        if (id == this.players[this.index].id) {
+            clearTimeout(this.waitTimeout);
+            this.resolve();
+        }
+    }
+
+    private async ready() {
+        return new Promise((resolve, reject) => {
+            this.resolve = resolve;
+            this.waitTimeout = setTimeout(reject, THROW_TIMEOUT);
+        });
+    }
+
     private async wait(time: number) {
         return new Promise((resolve, _) => {
-            let timeout: NodeJS.Timeout;
-            let interrupt = {
-                event: 'interrupt',
-                handler: () => {
-                    clearTimeout(timeout);
-                    resolve();
-                }
-            };
-            this.once(interrupt.event, interrupt.handler);
-            timeout = setTimeout(() => {
-                this.removeListener(interrupt.event, interrupt.handler);
-                resolve();
-            }, time);
+            this.resolve = resolve;
+            this.waitTimeout = setTimeout(resolve, time);
         });
     }
 
