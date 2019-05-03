@@ -60,10 +60,6 @@ export default class RoomView extends View {
             Router.listen().navigate('join').check();
         }
 
-        $('canvas').onclick = event => {
-            Physics.addDot(event.offsetX, event.offsetY);
-        };
-
         Graphics.init(<HTMLCanvasElement> $('canvas'));
         Physics.init(await socket.request('room:scheme:physics'));
         Rules.init(await socket.request('room:scheme:game'));
