@@ -1,4 +1,4 @@
-///<reference path='../lib/js.cookie.d.ts'/>
+import * as Cookies from '../lib/cookie/cookie.js';
 
 import { $, View } from '../lib/turtle/export.js';
 import Router from '../lib/turtle/router.js';
