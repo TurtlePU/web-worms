@@ -13,11 +13,11 @@ $ npm i
 dev-сервер с hot reload и вот это вот всё:
 
 ```shell
-$ npm run serve
+$ npm run dev
 ```
 
 production-сервер:
 
 ```shell
-$ npm start
+$ npm run build && npm start
 ```
