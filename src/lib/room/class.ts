@@ -26,7 +26,7 @@ export abstract class SocketRoom <
         this.flush();
     }
 
-    get socketList() {
+    get_socket_list() {
         return [...this.sockets];
     }
 
