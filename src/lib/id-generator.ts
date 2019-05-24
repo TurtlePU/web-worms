@@ -45,7 +45,7 @@ export function initIdGenerator(words: string[], length: number) {
  * @throws RangeError if too many requests
  * @returns next ID
  */
-export default function() {
+export function next_id() {
     let nxt = id.next();
     if (nxt.done) {
         throw new RangeError('All IDs are used');

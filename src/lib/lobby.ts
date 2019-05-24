@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import nextID from './id-generator';
+import { next_id } from './id-generator';
 
 import {
     Handler,
@@ -81,7 +81,7 @@ class Lobby extends SocketRoom<Info> implements ILobby {
 
     /** Makes new lobby with human-readable random id. */
     constructor() {
-        super(nextID());
+        super(next_id());
     }
 
     add(socket: Socket) {
