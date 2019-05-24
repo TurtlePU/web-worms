@@ -1,9 +1,9 @@
-import * as Cookies from '../lib/cookie/cookie.js';
+import * as Cookies from '../lib/cookie';
 
-import { $, View } from '../lib/turtle/export.js';
-import Router from '../lib/turtle/router.js';
+import { $, View } from '../lib/turtle';
+import Router from '../lib/router';
 
-import socket from '../lib/socket/wrapper.js';
+import socket from '../lib/socket';
 
 const html = /* html */`
     <h1>Worms II</h1>

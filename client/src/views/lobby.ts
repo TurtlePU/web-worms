@@ -1,7 +1,7 @@
-import socket from '../lib/socket/wrapper.js';
+import socket from '../lib/socket';
 
-import { $, View } from '../lib/turtle/export.js';
-import Router from '../lib/turtle/router.js';
+import { $, View } from '../lib/turtle';
+import Router from '../lib/router';
 
 const html = /* html */`
     <h1>Lobby</h1>

@@ -4,7 +4,9 @@ import Lobby from './lib/lobby';
 import Room  from './lib/room';
 
 Lobby.on('start', (id: string, sockets: socket.Socket[]) => {
+    console.log('start');
     Room.from(id, sockets);
+    console.log('made a room');
     Room.get(id).start();
 });
 

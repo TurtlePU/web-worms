@@ -1,7 +1,6 @@
-///<reference path='socket.io.d.ts'/>
-///<reference path='socket.wrap.d.ts'/>
+import io from 'socket.io-client';
 
-var socket = io();
+var socket = <Socket> io();
 
 socket.request = async (request: string, ...args: any[]) => {
     return new Promise((resolve, reject) => {
@@ -18,3 +17,13 @@ socket.request = async (request: string, ...args: any[]) => {
 };
 
 export default socket;
+
+interface Socket extends SocketIOClient.Socket {
+    /**
+     * Sends socket request.
+     * @param request - request name
+     * @param args - any params of request
+     * @returns Promise resolving with the request result
+     */
+    request(request: string, ...args: any[]): Promise<any>
+}

@@ -4,31 +4,38 @@
   "description": "Worms II in your browser. Not affiliated with Team 17.",
   "main": "dist/server.js",
   "scripts": {
-    "clean": "rm -rf dist client/dist",
-    "prestart": "npm run clean && tsc && tsc -p client",
-    "start": "node dist/server.js",
-    "watch": "concurrently -n \"TS server,TS client, nodemon \" -c cyanBright,blueBright,magentaBright -p name \"tsc -w\" \"tsc -p client -w\" \"nodemon\"",
-    "serve": "npm run prestart && npm run watch"
+    "build-server": "rm -rf build && parcel build src/server.ts --target node --out-dir build --no-source-maps",
+    "build-client": "rm -rf client/build && parcel build client/src/index.html --out-dir client/build --no-source-maps",
+    "build": "npm run build-server && npm run build-client",
+    "start": "node build/server.js",
+    "watch-server": "rm -rf dist && parcel src/server.ts --target node",
+    "watch-client": "rm -rf client/dist && parcel watch client/src/index.html --out-dir client/dist",
+    "dev-server": "cross-env DEV_SERVER=true nodemon",
+    "dev": "concurrently -n \"server,server,client\" -c cyanBright,cyanBright,magentaBright -p name \"npm:watch-server\" \"npm:dev-server\" \"npm:watch-client\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TurtlePU/web-worms.git"
   },
   "author": "P.U. Turtle",
-  "license": "WTFPL",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/TurtlePU/web-worms/issues"
   },
   "homepage": "https://github.com/TurtlePU/web-worms#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",
     "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "concurrently": "^4.1.0",
+    "cross-env": "^5.2.0",
     "nodemon": "^1.19.0",
+    "parcel-bundler": "^1.12.3",
     "typescript": "^3.4.5"
   }
 }

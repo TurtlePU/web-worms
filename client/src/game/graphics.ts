@@ -1,4 +1,4 @@
-import { dim } from './const.js';
+import { dim } from './const';
 
 class GraphicsEngine {
     private canvas: HTMLCanvasElement;

@@ -1,3 +1,3 @@
-export { Graphics } from './graphics.js';
-export { Physics } from './physics.js';
-export { Rules } from './rules.js';
+export { Graphics } from './graphics';
+export { Physics } from './physics';
+export { Rules } from './rules';

@@ -1,11 +1,11 @@
-import * as Cookies from '../lib/cookie/cookie.js';
+import * as Cookies from '../lib/cookie';
 
-import { $, View } from '../lib/turtle/export.js';
-import Router from '../lib/turtle/router.js';
+import { $, View } from '../lib/turtle';
+import Router from '../lib/router';
 
-import socket from '../lib/socket/wrapper.js';
+import socket from '../lib/socket';
 
-import { Graphics, Physics, Rules } from '../game/export.js';
+import { Graphics, Physics, Rules } from '../game/export';
 
 const html = /* html */`
     <div><canvas id='canvas'></canvas></div>

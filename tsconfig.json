@@ -3,11 +3,11 @@
         "esModuleInterop": true,
         "module": "commonjs",
         "moduleResolution": "node",
-        "noImplicitAny": true,
         "outDir": "dist",
         "preserveWatchOutput": true,
         "resolveJsonModule": true,
-        "target": "es6",
+        "noImplicitAny": true,
+        "downlevelIteration": true
     },
     "files": [
         "src/server.ts",

@@ -75,13 +75,14 @@ class Room extends SocketRoom<Info> implements IRoom {
     constructor(id: string, sockets: Socket[]) {
         super(id);
 
-        this.oldSockets = new Set();
-        sockets.forEach(socket => this.add(socket));
-
         this.game = new Game(
             physics.basic,
             game.basic
         );
+
+        this.oldSockets = new Set();
+        sockets.forEach(socket => this.add(socket));
+
         // TODO: add game event handlers
     }
 

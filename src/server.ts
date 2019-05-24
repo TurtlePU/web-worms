@@ -11,11 +11,12 @@ import { digits } from './data/export';
 
 initIdGenerator(digits, 3);
 
+const folder = process.env.DEV_SERVER ? 'dist' : 'build';
+const PATH = path.join(__dirname, `../client/${folder}/index.html`);
+
 const app = express();
-app.get('/', (_, res) => {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
-});
-app.use(express.static('client'));
+app.get('/', (_, res) => res.sendFile(PATH));
+app.use(express.static(`client/${folder}`));
 
 const httpServer = new http.Server(app);
 const PORT = parseInt(process.env.PORT) || 3000;
