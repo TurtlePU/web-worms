@@ -9,17 +9,6 @@ import { Socket } from './socket/socket-class';
 
 initIdGenerator(digits, 3);
 
-Lobby.on('start', (id: string, sockets: SocketIO.Socket[]) => {
-    console.log('start');
-    Room.from(id, sockets);
-    console.log('made a room');
-    Room.get(id).start();
-});
-
-Room.on('end', (id: string) => {
-    Lobby.flush(id);
-});
-
 /**
  * Adds event listeners to the given socket.
  * @param socket - Socket passed on 'connection' event
