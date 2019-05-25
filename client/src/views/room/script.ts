@@ -1,41 +1,24 @@
-import { $, View } from '../lib/turtle';
-import Router from '../lib/router';
+import { readFileSync } from 'fs';
 
-import socket from '../lib/socket';
+import { $, View } from '../../lib/turtle';
+import Router from '../../lib/router';
 
-import { Graphics, Physics, Rules } from '../game/export';
+import socket from '../../lib/socket';
 
-const html = /* html */`
-    <div><canvas id='canvas'></canvas></div>
-    <div><button id='quit'>Quit</button></div>
-`;
-
-function fail(message: string) {
-    Router.navigate('join');
-    alert(message);
-}
+import { Graphics, Physics, Rules } from '../../game/export';
 
 export default class RoomView extends View {
     private animate: boolean;
     private last: number;
 
     constructor() {
-        super('room', html);
+        super('room', readFileSync(__dirname + '/view.html', 'utf8'));
 
         socket.on('room:start', (room_id: string) => {
             Router.navigate(`room/${room_id}`);
         });
 
         this.draw = this.draw.bind(this);
-    }
-
-    private draw(time: number) {
-        Physics.update(time - this.last);
-        this.last = time;
-        Graphics.render();
-        if (this.animate) {
-            requestAnimationFrame(this.draw);
-        }
     }
 
     async load(path: string, room_id: string, reconnect?: string) {
@@ -72,4 +55,18 @@ export default class RoomView extends View {
 
         socket.request('game:ready');
     }
+
+    private draw(time: number) {
+        Physics.update(time - this.last);
+        this.last = time;
+        Graphics.render();
+        if (this.animate) {
+            requestAnimationFrame(this.draw);
+        }
+    }
+}
+
+function fail(message: string) {
+    Router.navigate('join');
+    alert(message);
 }

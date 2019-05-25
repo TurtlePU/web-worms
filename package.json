@@ -23,6 +23,12 @@
     "url": "https://github.com/TurtlePU/web-worms/issues"
   },
   "homepage": "https://github.com/TurtlePU/web-worms#readme",
+  "alias": {
+    "router": "./client/src/lib/router",
+    "socket": "./client/src/lib/socket",
+    "turtle": "./client/src/lib/turtle",
+    "cookie": "./client/src/lib/cookie"
+  },
   "dependencies": {
     "express": "^4.16.4",
     "socket.io": "^2.2.0",

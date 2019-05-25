@@ -1,8 +1,8 @@
 import Router from './lib/router';
 
-import JoinView  from './views/join';
-import LobbyView from './views/lobby';
-import RoomView  from './views/room';
+import JoinView  from './views/join/script';
+import LobbyView from './views/lobby/script';
+import RoomView  from './views/room/script';
 
 window.onload = async () => {
     const joinView  = new JoinView();

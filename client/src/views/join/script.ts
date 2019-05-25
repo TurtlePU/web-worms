@@ -1,35 +1,17 @@
-import * as Cookies from '../lib/cookie';
+import Router from 'router';
+import socket from 'socket';
 
-import { $, View } from '../lib/turtle';
-import Router from '../lib/router';
+import { readFileSync } from 'fs';
+import { $, View } from 'turtle';
 
-import socket from '../lib/socket';
-
-const html = /* html */`
-    <h1>Worms II</h1>
-    <input type='text' id='lobby-id' placeholder='Lobby/Room ID'>
-    <button id='go'>Go</button> <button id='random'>I'm lucky</button>
-    <button id='reconnect'>Reconnect</button>
-`;
+import * as Cookies from 'cookie';
 
 export default class JoinView extends View {
     private input: HTMLInputElement;
 
     constructor() {
-        super('join', html);
+        super('join', readFileSync(__dirname + '/view.html', 'utf8'));
         this.joinConcrete = this.joinConcrete.bind(this);
-    }
-
-    private async joinConcrete() {
-        let lobby = this.input.value.replace(/\s/g, '');
-        if (lobby !== '') {
-            let exists = await socket.request('lobby:check', lobby);
-            if (exists) {
-                Router.navigate(`lobby/${lobby}`);
-            } else {
-                Router.navigate(`room/${lobby}`);
-            }
-        }
     }
 
     async load(path: string) {
@@ -59,5 +41,17 @@ export default class JoinView extends View {
         $('reconnect').onclick = () => {
             Router.navigate(`room/${room_id}`);
         };
+    }
+
+    private async joinConcrete() {
+        let lobby = this.input.value.replace(/\s/g, '');
+        if (lobby !== '') {
+            let exists = await socket.request('lobby:check', lobby);
+            if (exists) {
+                Router.navigate(`lobby/${lobby}`);
+            } else {
+                Router.navigate(`room/${lobby}`);
+            }
+        }
     }
 }

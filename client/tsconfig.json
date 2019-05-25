@@ -4,6 +4,12 @@
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
         "outDir": "dist",
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "src/lib/*"
+            ]
+        },
         "preserveWatchOutput": true
     },
     "files": [
