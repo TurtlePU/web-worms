@@ -1,9 +1,8 @@
+import Router from 'router';
+import socket from 'socket';
+
 import { readFileSync } from 'fs';
-
-import socket from '../../lib/socket';
-
-import { $, View } from '../../lib/turtle';
-import Router from '../../lib/router';
+import { $, View } from 'turtle';
 
 export default class LobbyView extends View {
     private public_id: string;

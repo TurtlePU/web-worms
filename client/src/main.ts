@@ -1,4 +1,4 @@
-import Router from './lib/router';
+import Router from 'router';
 
 import JoinView  from './views/join/script';
 import LobbyView from './views/lobby/script';

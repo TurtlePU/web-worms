@@ -7,7 +7,7 @@ import socket  from 'socket.io';
 import listen  from './socket/main';
 
 const folder = process.env.DEV_SERVER ? 'dist' : 'build';
-const index = path.join(__dirname, `../client/${folder}/index.html`);
+const index = path.join(__dirname, `../../client/${folder}/index.html`);
 
 const app = express();
 app.get('/', (_, res) => res.sendFile(index));
