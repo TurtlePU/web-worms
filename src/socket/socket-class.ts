@@ -1,18 +1,29 @@
 import StatePool from './state-pool';
 
 import { dummy } from './socket-state';
+import { beautify } from '../lib/id-generator';
 
 export class Socket {
     readonly id: string;
+    readonly public_id: string;
     private socket: SocketIO.Socket;
 
     constructor(socket: SocketIO.Socket) {
-        this.socket = socket;
         this.id = socket.id;
+        this.public_id = beautify(this.id);
+        this.socket = socket;
     }
 
     get ready() {
         return StatePool.get(this.id).ready;
+    }
+
+    get room_id() {
+        return StatePool.get(this.id).room_id;
+    }
+
+    set ready(ready: boolean) {
+        StatePool.set(this.id, { ready });
     }
 
     emit(event: string, ...args: any[]) {

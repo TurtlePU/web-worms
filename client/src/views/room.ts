@@ -1,5 +1,3 @@
-import * as Cookies from '../lib/cookie';
-
 import { $, View } from '../lib/turtle';
 import Router from '../lib/router';
 
@@ -24,10 +22,8 @@ export default class RoomView extends View {
     constructor() {
         super('room', html);
 
-        socket
-        .on('room:start', (roomID: string) => {
-            Cookies.set('socket', socket.id);
-            Router.navigate(`room/${roomID}`);
+        socket.on('room:start', (room_id: string) => {
+            Router.navigate(`room/${room_id}`);
         });
 
         this.draw = this.draw.bind(this);
@@ -42,17 +38,21 @@ export default class RoomView extends View {
         }
     }
 
-    async load(path: string, roomID: string) {
+    async load(path: string, room_id: string, reconnect?: string) {
         super.load(path);
 
-        if (!await socket.request('room:check', roomID, Cookies.get('socket'))) {
-            return fail(`Room ${roomID} is inaccessible from old socket`);
-        }
-        if (!await socket.request('room:join', roomID, Cookies.get('socket'))) {
-            return fail(`Room ${roomID} is full`);
+        if (reconnect) {
+            if (!await socket.request('room:reconnect')) {
+                fail('Failed to reconnect');
+                return;
+            }
+        } else {
+            if (!await socket.request('room:checkme', room_id)) {
+                fail('Aborted connection to the room');
+                return;
+            }
         }
 
-        Cookies.set('room', roomID);
         Router.unlisten();
 
         $('quit').onclick = () => {
@@ -62,13 +62,14 @@ export default class RoomView extends View {
         }
 
         Graphics.init(<HTMLCanvasElement> $('canvas'));
-        Physics.init(await socket.request('room:scheme:physics'));
-        Rules.init(await socket.request('room:scheme:game'));
+        let { rules, physics } = await socket.request('game:scheme');
+        Physics.init(physics);
+        Rules.init(rules);
 
         this.animate = true;
         this.last = performance.now();
         requestAnimationFrame(this.draw);
 
-        socket.emit('game:ready');
+        socket.request('game:ready');
     }
 }

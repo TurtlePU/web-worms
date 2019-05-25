@@ -11,12 +11,8 @@ const html = /* html */`
     <table><tbody id='mems'></tbody></table>
 `;
 
-function socketText(id: string, ready: boolean, first: boolean) {
-    return /*html*/`
-        <td>${id}</td>
-        <td>${ready ? '✔️' : '❌'}</td>
-        <td>${id == socket.id ? '⬅️' : ''}${first ? '🥇' : ''}</td>
-    `;
+function ready_sign(ready: boolean) {
+    return ready ? '✔️' : '❌';
 }
 
 function fail(message: string) {
@@ -25,15 +21,18 @@ function fail(message: string) {
 }
 
 export default class LobbyView extends View {
+    private public_id: string;
+
     constructor() {
         super('lobby', html);
 
         socket
-        .on('lobby:join', (socketID: string, ready: boolean, first: boolean) => {
+        .on('lobby:join', async (socketID: string, ready: boolean, first: boolean) => {
+            this.public_id = await socket.request('lobby:getme');
             this.insertNode(socketID, ready, first);
         })
-        .on('lobby:ready', (socketID: string, ready: boolean, first: boolean) => {
-            $(`socket-${socketID}`).innerHTML = socketText(socketID, ready, first);
+        .on('lobby:ready', (socketID: string, ready: boolean) => {
+            $(`ready-${socketID}`).innerHTML = ready_sign(ready);
         })
         .on('lobby:start-enabled', (enabled: boolean) => {
             (<HTMLButtonElement> $('start')).disabled = !enabled;
@@ -48,7 +47,15 @@ export default class LobbyView extends View {
             return;
         }
         $('mems').innerHTML += /*html*/`
-            <tr id='socket-${id}'>${socketText(id, ready, first)}</tr>
+            <tr id='socket-${id}'>${this.socketText(id, ready, first)}</tr>
+        `;
+    }
+
+    private socketText(id: string, ready: boolean, first: boolean) {
+        return /*html*/`
+            <td>${id}</td>
+            <td id='ready-${id}'>${ready_sign(ready)}</td>
+            <td>${id == this.public_id ? '⬅️' : ''}${first ? '🥇' : ''}</td>
         `;
     }
 
@@ -77,8 +84,10 @@ export default class LobbyView extends View {
             return fail(`Lobby is full: ${lobbyID}`);
         }
 
-        for (let { id, ready, first } of await socket.request('lobby:members', lobbyID)) {
+        for (let [ id, ready, first ] of await socket.request('lobby:members', lobbyID)) {
             this.insertNode(id, ready, first);
         }
+
+        this.public_id = await socket.request('lobby:getme');
     }
 }

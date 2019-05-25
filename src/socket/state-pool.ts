@@ -1,4 +1,4 @@
-import { SocketState, dummy } from './socket-state';
+import { PartialState, SocketState, dummy } from './socket-state';
 
 export class StatePool {
     private pool: Map<string, SocketState>
@@ -15,8 +15,9 @@ export class StatePool {
         return this.pool.get(id) || dummy;
     }
 
-    set(id: string, state: SocketState) {
-        this.pool.set(id, state);
+    set(id: string, state: PartialState) {
+        let old_state = this.pool.get(id);
+        this.pool.set(id, { ...old_state, ...state });
     }
 
     inherit(old_id: string, new_id: string) {

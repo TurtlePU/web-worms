@@ -32,7 +32,7 @@ export default class JoinView extends View {
         }
     }
 
-    load(path: string) {
+    async load(path: string) {
         super.load(path);
 
         this.input = <HTMLInputElement> $('lobby-id');
@@ -49,8 +49,15 @@ export default class JoinView extends View {
             Router.navigate(`lobby/${id}`);
         };
 
+        let old_socket_id = Cookies.get('socket');
+        Cookies.set('socket', socket.id);
+        if (!await socket.request('state:inherit', old_socket_id)) {
+            console.warn('old socket state not found');
+        }
+        let room_id = (await socket.request('state:get')).room_id;
+
         $('reconnect').onclick = () => {
-            Router.navigate(`room/${Cookies.get('room')}`);
+            Router.navigate(`room/${room_id}`);
         };
     }
 }

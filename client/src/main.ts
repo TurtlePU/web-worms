@@ -11,8 +11,8 @@ window.onload = async () => {
 
     Router
         .setRoot(joinView.id)
-        .add(joinView.id,   joinView.load)
+        .add(joinView.id, joinView.load)
         .add(/lobby\/(.+)/, lobbyView.load)
-        .add(/room\/(.+)/,  roomView.load)
+        .add(/room\/(.+)(\*)?/, roomView.load)
         .listen().navigate();
 };

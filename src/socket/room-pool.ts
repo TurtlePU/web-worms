@@ -32,6 +32,7 @@ class RoomPool {
         room
             .on('free', () => this.lobbies.add(room.id))
             .on('full', () => this.lobbies.delete(room.id));
+        this.lobbies.add(room.id);
     }
 }
 

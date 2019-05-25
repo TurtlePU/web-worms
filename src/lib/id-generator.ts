@@ -52,3 +52,17 @@ export function next_id() {
     }
     return toString(nxt.value);
 };
+
+/**
+ * Makes human-readable name of a player from its socket id.
+ * @param socket_id
+ * @returns name generated from id.
+ */
+export function beautify(socket_id: string): string {
+    let number = socket_id
+        .substr(0, idLength)
+        .split('')
+        .map(char => char.charCodeAt(0) % digits.length)
+        .reduce((number, digit) => number * digits.length + digit);
+    return toString(number);
+}
